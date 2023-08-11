@@ -7,7 +7,8 @@
 ### Estructura:
 main\
 ├── test\
-├── User\
-├── User-dev\
-├── Jour\
-└── Jour-dev
+├── branch1\
+├── branch1-dev\
+├── branch2\
+├── brach2-dev\
+...
