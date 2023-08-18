@@ -29,8 +29,4 @@ class Apostador {
     estado!: String
 }
 
-console.log("a")
-
 export const apostadorModel = getModelForClass(Apostador)
-
-console.log("b")

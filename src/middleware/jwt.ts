@@ -1,12 +1,10 @@
 import jwt from "jsonwebtoken";
 
-const claveSecreta = "Secreto-Poli-Bet";
-
 export function generarClave(nombre: String): string{
     let dataFirma = {
         "nombre": nombre
     }
-    let respuesta = jwt.sign(dataFirma, claveSecreta, {expiresIn:'1d'});
+    let respuesta = jwt.sign(dataFirma, process.env.JWT_SECRET!, {expiresIn:'1d'});
 
     return respuesta;
 }
@@ -19,7 +17,7 @@ export function verificarClave(req: any, res: any, next: any){
     }
 
     try {
-        const payload: any = jwt.verify(clave, claveSecreta);
+        const payload: any = jwt.verify(clave, process.env.JWT_SECRET!);
         const nombreGenerado: string = payload.nombre;
 
         const nombreSolicitud: string = req.body.nombreUsuario;

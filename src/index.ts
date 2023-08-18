@@ -1,25 +1,21 @@
-//* Deps
-import express from 'express';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+import express from "express";
+import bodyParser from 'body-parser';
+import mongoose from "mongoose";
+import dotenv from 'dotenv'
+import { rutasUsuarios } from "./routes/user.routes";
 
-//* Routers
-//? Agregar routers
-//? import placeholderRouter from './routes/placeholder.routes.ts';
-
-//* Setup
-const app = express()
+const app = express();
+const puerto = 3000;
 dotenv.config()
 
-//! Guardar y acceder a cosas como direcciones IP, claves, etc, desde '.env'
-app
-    .use(express.json())
-    .listen(process.env.API_PORT, () => {
-        console.log(`API service on: http://localhost:${process.env.API_PORT}`)
-    })
+app.get("", (req, res) => res.send("Bienvenido a mi api"));
+
+app.listen(puerto, () => console.log("Escuchando en el puerto: " + puerto));
+
+app.use("/usuarios", bodyParser.json(),rutasUsuarios);
 
 mongoose
-    .set("strictQuery", false)
-    .connect(process.env.DB_CON_STR!).then(() => {
+    .set("strictQuery",  false)
+    .connect(process.env.MONGO_CON_STRING!).then(() => {
         console.log(`mongoDB connection initialized.`)
     })

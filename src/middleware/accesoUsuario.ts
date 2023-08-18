@@ -1,6 +1,6 @@
 
 import { Collection, Db, Filter, FindCursor } from "mongodb";
-import { Usuario } from "../Models/Usuario";
+import { Usuario } from "../src/models/Usuario";
 import { createHash } from 'node:crypto';
 
 function sha256(content: string) {  

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import bodyParser from 'body-parser';
-import ApostadorController from "../Controller/Apostador.controller";
+import ApostadorController from "../controllers/Apostador.controller";
 
 export let rutasUsuarios = Router();
 

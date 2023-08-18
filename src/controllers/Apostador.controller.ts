@@ -1,7 +1,7 @@
-import { apostadorModel } from "../Models/Apostador";
-import { apostadorVerify } from "../Models/ApostadorVerify";
+import { apostadorModel } from "../models/Apostador.model";
+import { apostadorVerify } from "../models/ApostadorVerify.model";
 import { createHash } from 'node:crypto';
-import { generarClave, verificarClave } from "../jwt";
+import { generarClave, verificarClave } from "../middleware/jwt";
 const otpGenerator = require('otp-generator');
 
 //Regex
