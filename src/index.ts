@@ -3,16 +3,19 @@ import bodyParser from 'body-parser';
 import mongoose from "mongoose";
 import dotenv from 'dotenv'
 import { rutasUsuarios } from "./routes/user.routes";
+import { PeriodistaRouter } from "./routes/periodista.routes";
 
 const app = express();
-const puerto = 3000;
+const PORT = 3000;
 dotenv.config()
 
 app.get("", (req, res) => res.send("Bienvenido a mi api"));
 
-app.listen(puerto, () => console.log("Escuchando en el puerto: " + puerto));
+app.listen(PORT, () => console.log(`BetPoeli deployed on http://localhost:${PORT}`));
 
 app.use("/usuarios", bodyParser.json(),rutasUsuarios);
+app.use("/periodistas", bodyParser.json(), PeriodistaRouter);
+
 
 mongoose
     .set("strictQuery",  false)
