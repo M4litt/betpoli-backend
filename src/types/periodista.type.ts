@@ -11,18 +11,16 @@ export class IPeriodista {
     empresa_perteneciente: string = ''
 };
 /*
-
-testing
-
+4 testin
 {
-    "nombre":                "perdidostita",
-    "apellido":              "clodomirense",
-    "password":              "1234",
-    "domicilio":             "pampa y la via",
-    "fecha_de_nac":          "12-12-99",
-    "documento":             "foto o num nose",
-    "mail":                  "clodomiro@periodista.com",
-    "telefono":              "12-3456-7890",
+    "nombre": "perdidostita",
+    "apellido": "clodomirense",
+    "password": "1234",
+    "domicilio": "pampa y la via",
+    "fecha_de_nac": "12-12-99",
+    "documento": "foto o num nose",
+    "mail": "clodomiro@periodista.com",
+    "telefono": "12-3456-7890",
     "empresa_perteneciente": "CUM inc"
 }
 
