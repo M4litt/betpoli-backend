@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv'
 import { createHash } from 'node:crypto';
 
+import { Response, Request} from 'express';
+
 // user
 import { IPeriodista } from '../types/periodista.type';
 import { periodistaModel } from '../models/periodista.model';
@@ -13,7 +15,8 @@ dotenv.config();
 const SALT = "1234";
 
 export class PeriodistaController {
-    public static register(user:IPeriodista): Promise<any> {
+    
+    private static registerP(user:IPeriodista): Promise<any> {
 
         return new Promise((resolve, reject) => {
             periodistaModel.findOne({ mail: user.mail })
@@ -32,7 +35,7 @@ export class PeriodistaController {
         });
     }
 
-    public static login(user:IPeriodista): Promise<any> {
+    private static loginP(user:IPeriodista): Promise<any> {
         return new Promise((resolve, reject) => {
             periodistaModel.findOne({ mail: user.mail })
             .then(Iuser => {
@@ -56,6 +59,20 @@ export class PeriodistaController {
 
     private static sha256(content: string) {  
         return createHash('sha256').update(content).digest('hex')
+    }
+
+    public static register(req:Request, res:Response){
+        const user: IPeriodista = req.body;
+        this.registerP(user)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+    
+    public static login(req:Request, res:Response){
+        const user: IPeriodista = req.body;
+        this.loginP(user)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
     }
     
 }
