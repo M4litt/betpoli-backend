@@ -2,7 +2,9 @@ import { apostadorModel } from "../models/Apostador.model";
 import { apostadorVerify } from "../models/ApostadorVerify.model";
 import { createHash } from 'node:crypto';
 import { generarClave, verificarClave } from "../middleware/jwt";
+import { isValidObjectId } from "mongoose";
 const otpGenerator = require('otp-generator');
+const urlApiPartidos: String = "http://172.16.255.204:6969/matches"
 
 function isValidDate(dateString: string): boolean {
     const dateParts = dateString.split("-");
@@ -196,5 +198,19 @@ export default {
                 res.status(400).send("mail no encontrado");
             }
         })
+    },
+    Apostar(req: any, res: any){
+        if(!req.body.idPartido || !req.body.monto || !req.body.resultado){
+            res.status(200).send("no se proporcionaon todos los datos")
+        }
+        if(!isValidObjectId(req.body.idPartido)){
+            res.status(200).send("id de partido invalida")
+            return
+        }
+
+        fetch(urlApiPartidos + "/matches/" + req.body.idPartido, {method: "GET"})
+        .then((v) => v.json())
+        .then((b) => console.log(b))
+        .catch((err: any) => console.error('error:' + err));
     }
 }

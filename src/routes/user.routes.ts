@@ -7,3 +7,4 @@ export let rutasUsuarios = Router();
 rutasUsuarios.post("/registro", bodyParser.json(), ApostadorController.registro)
     .post("/verify", ApostadorController.verify)
     .post("/inicioSesion", ApostadorController.login)
+    .post("/apostar", ApostadorController.Apostar)
