@@ -14,7 +14,7 @@ export async function auth(req:Request, res:Response, next:NextFunction) {
 
         const decoded = jwt.verify(
             token!, 
-            process.env.A_SECRET_KEY || 'invalid-apostador-key'
+            process.env.JWT_APOSTADOR_SECRET || 'invalid-apostador-key'
         );
 
         next();

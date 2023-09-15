@@ -14,7 +14,7 @@ export async function auth(req:Request, res:Response, next:NextFunction) {
 
         const decoded = jwt.verify(
             token!, 
-            process.env.ADMIN_SECRET_KEY || 'invalid-admin-key'
+            process.env.JWT_ADMIN_SECRET || 'invalid-admin-key'
         );
 
         next();

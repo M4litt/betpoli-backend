@@ -14,7 +14,7 @@ export async function auth(req:Request, res:Response, next:NextFunction) {
 
         const decoded = jwt.verify(
             token!, 
-            process.env.P_SECRET_KEY || 'invalid-periodista-key'
+            process.env.JWT_PERIODISTA_SECRET || 'invalid-periodista-key'
         );
 
         next();

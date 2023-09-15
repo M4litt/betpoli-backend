@@ -21,7 +21,6 @@ export class PeriodistaController {
         return new Promise((resolve, reject) => {
             periodistaModel.findOne({ mail: user.mail })
             .then(res => {
-                console.log(res);
                 if (res) {
                     reject("User already exists");
                     return;
@@ -63,14 +62,16 @@ export class PeriodistaController {
 
     public static register(req:Request, res:Response){
         const user: IPeriodista = req.body;
-        this.registerP(user)
+
+        PeriodistaController.registerP(user)
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json({'message': err}))
     }
     
     public static login(req:Request, res:Response){
         const user: IPeriodista = req.body;
-        this.loginP(user)
+
+        PeriodistaController.loginP(user)
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json({'message': err}))
     }
