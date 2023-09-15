@@ -78,6 +78,7 @@ export default {
                         apostadorModel.create(req.body).then(data => {
                             data.save()
                             res.status(201).send(data)
+                            return;
                         });
                         const configOTP = {
                             lowerCaseAlphabets: false,
