@@ -2,17 +2,41 @@ import { apostadorModel } from "../models/Apostador.model";
 import { apostadorVerify } from "../models/ApostadorVerify.model";
 import { createHash } from 'node:crypto';
 import { generarClave, verificarClave } from "../middleware/jwt";
+import { Request, Response } from "express";
 const otpGenerator = require('otp-generator');
 
-import { Request, Response } from "express";
+function isValidDate(dateString: string): boolean {
+    const dateParts = dateString.split("-");
+    
+    if (dateParts.length !== 3) {
+        return false;
+    }
+    
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]);
+    const day = parseInt(dateParts[2]);
+
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+        return false;
+    }
+
+    const date = new Date(year, month - 1, day);
+
+    return (
+        date.getFullYear() === year &&
+        date.getMonth() === month - 1 &&
+        date.getDate() === day
+    );
+}
 
 //Regex
-const mailRegex:   RegExp = new RegExp("[A-Za-z0-9]+@[a-z]+\.[a-z]{2,3}");
+const mailRegex: RegExp = new RegExp("[A-Za-z0-9]+@[a-z]+\.[a-z]{2,3}");
 const contraRegex: RegExp = new RegExp("^(?=.*[A-Z])(?=.*[0-9]).{8,}$");
-const fotoRegex:   RegExp = new RegExp("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$");
+const fotoRegex: RegExp = new RegExp("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/][AQgw]==|[A-Za-z0-9+/]{2}[AEIMQUYcgkosw048]=)?$");
+const fechaRegex: RegExp = new RegExp("[0-9]{4}-[0-9]{2}-[0-9]{2}")
+const nombreApellidoRegex: RegExp = new RegExp("^[A-Za-z]{1,25}$")
 
 const nodemailer = require('nodemailer');
-
 const transporter = nodemailer.createTransport({
     port: 465,
     host: "smtp.gmail.com",
@@ -46,6 +70,7 @@ export default {
     registro(req: Request, res: Response) {
         if (!req.body.contraseña || !req.body.nombre || !req.body.mail || !req.body.DNI
             || !req.body.fechaNac || !req.body.apellido || !req.body.fotoDoc) {
+            console.log(req.body)
             res.status(400).send("No se proporcionaron todos los datos");
             return;
         }
@@ -55,7 +80,7 @@ export default {
             return;
         }
 
-        if (req.body.DNI.length != 8) {
+        if (req.body.DNI.length != 8 || isNaN(Number(req.body.DNI))) {
             res.status(400).send("DNI invalido");
             return;
         }
@@ -64,21 +89,44 @@ export default {
             res.status(400).send("Contraseña insegura");
             return;
         }
-        
+
         if (!fotoRegex.test(req.body.fotoDoc.valueOf())) {
             res.status(400).send("Imagen invalida");
             return;
         }
+
+        if(!nombreApellidoRegex.test(req.body.nombre)){
+            res.status(400).send("Nombre Invalido");
+            return;
+        }
+
+        if(!nombreApellidoRegex.test(req.body.apellido)){
+            res.status(400).send("Apellido Invalido");
+            return;
+        }
         
+        if(!fechaRegex.test(req.body.fechaNac) || !isValidDate(req.body.fechaNac)){
+            console.log(isValidDate(req.body.fechaNac))
+            res.status(400).send("Fecha de nacimiento no valida");
+            return;
+        }
 
         apostadorModel.findOne({ "DNI": req.body.DNI }).then((v) => {
             if (v == undefined) {
                 apostadorModel.findOne({ "mail": req.body.mail }).then((v) => {
                     if (v == undefined) {
-                        apostadorModel.create(req.body).then(data => {
+                       var todaladata = {
+                        creado: "",
+                        verify: "",
+                        sendMail: ""
+                       }
+                       const temp: any = req.body;
+                       temp["estado"] = "pendiente";
+                       temp["contraseña"] = sha256(req.body.contraseña);
+
+                        apostadorModel.create(temp).then(data => {
                             data.save()
-                            res.status(201).send(data)
-                            return;
+                            todaladata.creado = JSON.stringify(data)
                         });
                         const configOTP = {
                             lowerCaseAlphabets: false,
@@ -87,13 +135,15 @@ export default {
                         }
                         const OTP = otpGenerator.generate(4, configOTP);
                         console.log(OTP);
+                        
                         apostadorVerify.create({"mail": req.body.mail, "otp": OTP}).then(data => {
                             data.save()
-                            res.status(201).send(data)
+                            todaladata.verify = JSON.stringify(data)
                         });
                         sendMail(req.body.mail.valueOf(), "Verificacion del correo",
                             "Tu codigo de verificacion es: " + OTP)
-                        res.send(req.body);
+                            todaladata.sendMail = req.body
+                        res.send(todaladata);
                     }
                     else {
                         res.status(400).send("Mail ya en uso");
@@ -105,7 +155,6 @@ export default {
             }
         })
     },
-
     verify(req: Request, res: Response) {
         apostadorVerify.findOne({ "mail" :req.body.mail}).then((v) => {
             if (v == undefined) {
@@ -114,9 +163,11 @@ export default {
             }
             else {
                 if (v.otp == req.body.otp) {
-                    apostadorVerify.deleteOne({ "mail" :req.body.mail});
-                    apostadorVerify.findOneAndUpdate(req.body.mail, {$set:{estado:"activo"}});
-                    res.send("Verificacion correcta");
+                    apostadorModel.findOneAndUpdate({ "mail":req.body.mail}, {$set:{"estado":"activo"}}).then((b) => {
+                        apostadorVerify.deleteOne({ "mail" :req.body.mail}).then((p) => {
+                            res.send("Verificacion correcta");
+                        });
+                    });
                 }
                 else {
                     res.status(400).send("Codigo incorrecto");
@@ -124,11 +175,10 @@ export default {
             }
         })
     },
-
     login(req: Request, res: Response) {
         apostadorModel.findOne({ "mail": req.body.mail}).then((b) => {
             if (b) {
-                if(b.estado == "activo"){
+                if(b.estado != "activo"){
                     res.status(400).send("cuenta no activada");
                     return;
                 }
@@ -147,30 +197,5 @@ export default {
                 res.status(400).send("mail no encontrado");
             }
         })
-    },
-
-    setStateToActive(req: Request, res: Response) {
-
-        apostadorModel.findOne({ mail: req.body.mail })
-        .then((v) => { 
-            // if nothing found
-            if (!v) {
-                res.status(400).send("mail no encontrado");
-                return;
-            }
-
-            // set state to active
-            apostadorModel.findOneAndUpdate(
-                { mail: req.body.mail }, 
-                { $set: { 
-                    estado: "activo" 
-                }
-            })
-            .then(() => res.status(200).send("cuenta activada"))
-            .catch(err => res.status(400).send(err));
-            //res.send("cuenta activada");
-        })
-        .catch((err) => res.status(400).send("mail no encontrado"));
-
     }
 }

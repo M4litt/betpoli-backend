@@ -9,6 +9,10 @@ export const PeriodistaRouter = express.Router();
 PeriodistaRouter
 .post('/register', PeriodistaController.register)
 .post('/login', PeriodistaController.login)
+.get('/:id/partidos', PeriodistaController.getPartidos)
+.post('/:id/partidos/', PeriodistaController.addPartido)
+.delete('/:id/partidos/', PeriodistaController.removePartido)
+
 
 // -- authorization testing --
 .get('/', (req:Request, res:Response) => {

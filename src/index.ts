@@ -12,7 +12,7 @@ dotenv.config()
 
 app.get("", (req, res) => res.send("Bienvenido a mi api"));
 
-app.listen(PORT, () => console.log(`BetPoeli deployed on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`> BetPoeli deployed on http://localhost:${PORT}`));
 
 app.use("/usuarios", bodyParser.json(), rutasUsuarios);
 app.use("/periodistas", bodyParser.json(), PeriodistaRouter);
@@ -22,5 +22,5 @@ app.use("/equipos", bodyParser.json(), equipoRouter);
 mongoose
     .set("strictQuery",  false)
     .connect(process.env.MONGO_CON_STRING!).then(() => {
-        console.log(`mongoDB connection initialized.`)
+        console.log(`> mongoDB connection initialized.`)
     })

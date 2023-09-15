@@ -1,4 +1,4 @@
-
+/*
 import { Collection, Db, Filter, FindCursor } from "mongodb";
 import { Usuario } from "../src/models/Usuario";
 import { createHash } from 'node:crypto';
@@ -59,3 +59,4 @@ export class AccesoUsuario{
         }
     }
 }
+*/

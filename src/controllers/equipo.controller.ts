@@ -97,21 +97,5 @@ export class EquipoController {
 
     }
 
-    private static getIdByName(nombre:string):Promise<string|null> {
-        return new Promise((resolve, reject) => {
-
-            equipoModel.findOne({nombre: nombre})
-            .then(data => {
-                if (!data) {
-                    return null;
-                }
-                return data._id;
-            })
-            .catch(err => {
-                return null;
-            });
-
-        });
-    }
 
 }

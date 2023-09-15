@@ -8,6 +8,9 @@ import { Response, Request} from 'express';
 // user
 import { IPeriodista } from '../types/periodista.type';
 import { periodistaModel } from '../models/periodista.model';
+import { Partido } from '../types/partido.type';
+import { PartidoController } from './partido.controller';
+import { partidoModel } from '../models/partido.model';
 
 // env
 dotenv.config();
@@ -74,6 +77,66 @@ export class PeriodistaController {
         PeriodistaController.loginP(user)
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static addPartido(req:Request, res:Response){
+        const id = req.params.id;
+        const partido: Partido = req.body.partido;
+
+        periodistaModel.findByIdAndUpdate(
+            id, 
+            { $push: { partidos: partido } }
+        )
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static getPartidos(req:Request, res:Response){
+        const id = req.params.id;
+
+        periodistaModel.findById(id)
+        .then(data => {
+            if (!data) {
+                res.status(400).json({'message': 'Periodista not found'});
+                return;
+            }
+
+            let out_partidos: any[] = [];
+
+            data.partidos.forEach(partido => {
+
+                partidoModel.findById(partido)
+                .then(data => out_partidos.push(data))
+                .catch(err => res.status(400).json({'message': err}))
+                // nose si funciona esto
+
+            })
+            res.status(200).json(out_partidos)
+        })
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static removePartido(req:Request, res:Response) {
+        const id = req.params.id;
+
+        periodistaModel.findById(id)
+        .then(data => {
+            
+            if (!data) {
+                res.status(400).json({'message': 'Periodista not found'});
+                return;
+            }
+
+            periodistaModel.findByIdAndUpdate(
+                id,
+                { $pull: { partidos: { _id: req.body.partido._id } } }
+            )
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+
+        })
+        .catch(err => res.status(400).json({'message': err}))
+       
     }
     
 }

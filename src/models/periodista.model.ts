@@ -1,35 +1,38 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose"
 
-@modelOptions({ 
-    schemaOptions: { collection: "periodistas" } 
+@modelOptions({
+    schemaOptions: { collection: "periodistas" }
 })
 class Periodista {
     @prop({ required: true })
-    nombre:                string = '';
+    nombre: string = '';
 
     @prop({ required: true })
-    apellido:              string = '';
+    apellido: string = '';
 
     @prop({ required: true })
-    password:              string = '';
+    password: string = '';
 
     @prop({ required: true })
-    domicilio:             string = '';
+    domicilio: string = '';
 
     @prop({ required: true })
-    fecha_de_nac:          string = '';
+    fecha_de_nac: string = '';
 
     @prop({ required: true })
-    documento:             string = '';
+    documento: string = '';
 
     @prop({ required: true })
-    mail:                  string = '';
+    mail: string = '';
 
     @prop({ required: true })
-    telefono:              string = '';
+    telefono: string = '';
 
     @prop({ required: true })
     empresa_perteneciente: string = '';
+
+    @prop({ required: false })
+    partidos: string[] = [];
 };
 
 export const periodistaModel = getModelForClass(Periodista)
