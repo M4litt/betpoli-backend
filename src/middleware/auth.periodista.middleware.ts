@@ -22,7 +22,7 @@ export async function auth(req:Request, res:Response, next:NextFunction) {
     } 
     catch (err) {
 
-        res.status(401).send('Unauthorized token');
+        res.status(401).send('Unauthorized periodista token');
         
     }
 }

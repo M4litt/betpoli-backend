@@ -7,9 +7,9 @@ const otpGenerator = require('otp-generator');
 import { Request, Response } from "express";
 
 //Regex
-const mailRegex: RegExp = new RegExp("[A-Za-z0-9]+@[a-z]+\.[a-z]{2,3}");
+const mailRegex:   RegExp = new RegExp("[A-Za-z0-9]+@[a-z]+\.[a-z]{2,3}");
 const contraRegex: RegExp = new RegExp("^(?=.*[A-Z])(?=.*[0-9]).{8,}$");
-const fotoRegex: RegExp = new RegExp("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$");
+const fotoRegex:   RegExp = new RegExp("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$");
 
 const nodemailer = require('nodemailer');
 

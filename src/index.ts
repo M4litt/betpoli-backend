@@ -13,7 +13,7 @@ app.get("", (req, res) => res.send("Bienvenido a mi api"));
 
 app.listen(PORT, () => console.log(`BetPoeli deployed on http://localhost:${PORT}`));
 
-app.use("/usuarios", bodyParser.json(),rutasUsuarios);
+app.use("/usuarios", bodyParser.json(), rutasUsuarios);
 app.use("/periodistas", bodyParser.json(), PeriodistaRouter);
 
 
