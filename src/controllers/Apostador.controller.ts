@@ -4,12 +4,15 @@ import { createHash } from 'node:crypto';
 import { generarClave, verificarClave } from "../middleware/jwt";
 const otpGenerator = require('otp-generator');
 
+import { Request, Response } from "express";
+
 //Regex
 const mailRegex: RegExp = new RegExp("[A-Za-z0-9]+@[a-z]+\.[a-z]{2,3}");
 const contraRegex: RegExp = new RegExp("^(?=.*[A-Z])(?=.*[0-9]).{8,}$");
 const fotoRegex: RegExp = new RegExp("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$");
 
 const nodemailer = require('nodemailer');
+
 const transporter = nodemailer.createTransport({
     port: 465,
     host: "smtp.gmail.com",
@@ -40,7 +43,7 @@ function sha256(content: string) {
 }
 
 export default {
-    registro(req: any, res: any) {
+    registro(req: Request, res: Response) {
         if (!req.body.contraseña || !req.body.nombre || !req.body.mail || !req.body.DNI
             || !req.body.fechaNac || !req.body.apellido || !req.body.fotoDoc) {
             res.status(400).send("No se proporcionaron todos los datos");
@@ -61,11 +64,12 @@ export default {
             res.status(400).send("Contraseña insegura");
             return;
         }
-
+        
         if (!fotoRegex.test(req.body.fotoDoc.valueOf())) {
             res.status(400).send("Imagen invalida");
             return;
         }
+        
 
         apostadorModel.findOne({ "DNI": req.body.DNI }).then((v) => {
             if (v == undefined) {
@@ -100,7 +104,8 @@ export default {
             }
         })
     },
-    verify(req: any, res: any) {
+
+    verify(req: Request, res: Response) {
         apostadorVerify.findOne({ "mail" :req.body.mail}).then((v) => {
             if (v == undefined) {
                 res.status(400).send("Mail no encontrado");
@@ -118,7 +123,8 @@ export default {
             }
         })
     },
-    login(req: any, res: any) {
+
+    login(req: Request, res: Response) {
         apostadorModel.findOne({ "mail": req.body.mail}).then((b) => {
             if (b) {
                 if(b.estado == "activo"){
@@ -140,5 +146,30 @@ export default {
                 res.status(400).send("mail no encontrado");
             }
         })
+    },
+
+    setStateToActive(req: Request, res: Response) {
+
+        apostadorModel.findOne({ mail: req.body.mail })
+        .then((v) => { 
+            // if nothing found
+            if (!v) {
+                res.status(400).send("mail no encontrado");
+                return;
+            }
+
+            // set state to active
+            apostadorModel.findOneAndUpdate(
+                { mail: req.body.mail }, 
+                { $set: { 
+                    estado: "activo" 
+                }
+            })
+            .then(() => res.status(200).send("cuenta activada"))
+            .catch(err => res.status(400).send(err));
+            //res.send("cuenta activada");
+        })
+        .catch((err) => res.status(400).send("mail no encontrado"));
+
     }
 }
