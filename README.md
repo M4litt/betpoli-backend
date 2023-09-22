@@ -1,7 +1,7 @@
 # PARA LOS REVERENDOS HIJOS DE PUTA DE TESTING
 - crear el .env afuera de /src
 - poner los datos que especifica el env.manifest
-- poner en la terminal npm run dev
+- poner en la terminal $~ npm run dev
 - MARGA TE VOY A MATAR - Cali <{@}>
 
 # betpoli-backend
