@@ -1,19 +1,31 @@
 //* Deps
-import express from 'express';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+import express from "express"
+import dotenv from "dotenv";
+import mongoose from "mongoose";
 
 //* Routers
-//? Agregar routers
-//? import placeholderRouter from './routes/placeholder.routes.ts';
+import { userRouter } from "./routes/user.routes";
+import { matchRouter } from "./routes/match.routes";
 
-//* Setup
-const app = express()
+import swaggerUi = require('swagger-ui-express');
+import fs from "fs";
+
 dotenv.config()
 
-//! Guardar y acceder a cosas como direcciones IP, claves, etc, desde '.env'
+const app = express()
+
+const swaggerFile = (process.cwd()+"/swagger.json");
+const swaggerData = fs.readFileSync(swaggerFile, 'utf8');
+const swaggerDocument = JSON.parse(swaggerData);
+
 app
     .use(express.json())
+    .use('/users', userRouter)
+    .use('/matches', matchRouter)
+    .get('/', (req, res) => {
+        res.status(200).send('Conection stablished!')
+    })
+    .use('/matches/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, undefined, undefined, undefined))
     .listen(process.env.API_PORT, () => {
         console.log(`API service on: http://localhost:${process.env.API_PORT}`)
     })
