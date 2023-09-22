@@ -2,7 +2,7 @@
 - crear el .env afuera de /src
 - poner los datos que especifica el env.manifest
 - poner en la terminal $~ npm run dev
-- MARGA TE VOY A MATAR - Cali <{@}>
+- MARGA TE VOY A MATAR!!1! - Cali <{@}>
 
 # betpoli-backend
 ### Info:
