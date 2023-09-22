@@ -3,6 +3,7 @@
 - poner los datos que especifica el env.manifest
 - poner en la terminal $~ npm run dev
 - MARGA TE VOY A MATAR!!1! - Cali <{@}>
+- lean los archivos .routes para las rutas (｡◕‿‿◕｡)
 
 # betpoli-backend
 ### Info:
