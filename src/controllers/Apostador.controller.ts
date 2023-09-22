@@ -3,16 +3,18 @@ import { apostadorVerify } from "../models/ApostadorVerify.model";
 import { createHash } from 'node:crypto';
 import { generarClave, verificarClave } from "../middleware/jwt";
 import { isValidObjectId } from "mongoose";
+import { apuestaModel } from "../models/Apuesta.model";
+import jwt from "jsonwebtoken";
 const otpGenerator = require('otp-generator');
-const urlApiPartidos: String = "http://172.16.255.204:6969/matches"
+export const urlApiPartidos: String = "http://172.16.255.204:6969"
 
 function isValidDate(dateString: string): boolean {
     const dateParts = dateString.split("-");
-    
+
     if (dateParts.length !== 3) {
         return false;
     }
-    
+
     const year = parseInt(dateParts[0]);
     const month = parseInt(dateParts[1]);
     const day = parseInt(dateParts[2]);
@@ -63,7 +65,7 @@ function sendMail(to: String, subject: String, text: String) {
     })
 }
 
-function sha256(content: string) {  
+export function sha256(content: string) {
     return createHash('sha256').update(content).digest('hex')
 }
 
@@ -96,17 +98,17 @@ export default {
             return;
         }
 
-        if(!nombreApellidoRegex.test(req.body.nombre)){
+        if (!nombreApellidoRegex.test(req.body.nombre)) {
             res.status(400).send("Nombre Invalido");
             return;
         }
 
-        if(!nombreApellidoRegex.test(req.body.apellido)){
+        if (!nombreApellidoRegex.test(req.body.apellido)) {
             res.status(400).send("Apellido Invalido");
             return;
         }
-        
-        if(!fechaRegex.test(req.body.fechaNac) || !isValidDate(req.body.fechaNac)){
+
+        if (!fechaRegex.test(req.body.fechaNac) || !isValidDate(req.body.fechaNac)) {
             console.log(isValidDate(req.body.fechaNac))
             res.status(400).send("Fecha de nacimiento no valida");
             return;
@@ -116,14 +118,14 @@ export default {
             if (v == undefined) {
                 apostadorModel.findOne({ "mail": req.body.mail }).then((v) => {
                     if (v == undefined) {
-                       var todaladata = {
-                        creado: "",
-                        verify: "",
-                        sendMail: ""
-                       }
-                       const temp: any = req.body;
-                       temp["estado"] = "pendiente";
-                       temp["contraseña"] = sha256(req.body.contraseña);
+                        var todaladata = {
+                            creado: "",
+                            verify: "",
+                            sendMail: ""
+                        }
+                        const temp: any = req.body;
+                        temp["estado"] = "pendiente";
+                        temp["contraseña"] = sha256(req.body.contraseña);
 
                         apostadorModel.create(temp).then(data => {
                             data.save()
@@ -136,14 +138,14 @@ export default {
                         }
                         const OTP = otpGenerator.generate(4, configOTP);
                         console.log(OTP);
-                        
-                        apostadorVerify.create({"mail": req.body.mail, "otp": OTP}).then(data => {
+
+                        apostadorVerify.create({ "mail": req.body.mail, "otp": OTP }).then(data => {
                             data.save()
                             todaladata.verify = JSON.stringify(data)
                         });
                         sendMail(req.body.mail.valueOf(), "Verificacion del correo",
                             "Tu codigo de verificacion es: " + OTP)
-                            todaladata.sendMail = req.body
+                        todaladata.sendMail = req.body
                         res.send(todaladata);
                     }
                     else {
@@ -157,15 +159,15 @@ export default {
         })
     },
     verify(req: any, res: any) {
-        apostadorVerify.findOne({ "mail" :req.body.mail}).then((v) => {
+        apostadorVerify.findOne({ "mail": req.body.mail }).then((v) => {
             if (v == undefined) {
                 res.status(400).send("Mail no encontrado");
                 return;
             }
             else {
                 if (v.otp == req.body.otp) {
-                    apostadorModel.findOneAndUpdate({ "mail":req.body.mail}, {$set:{"estado":"activo"}}).then((b) => {
-                        apostadorVerify.deleteOne({ "mail" :req.body.mail}).then((p) => {
+                    apostadorModel.findOneAndUpdate({ "mail": req.body.mail }, { $set: { "estado": "activo" } }).then((b) => {
+                        apostadorVerify.deleteOne({ "mail": req.body.mail }).then((p) => {
                             res.send("Verificacion correcta");
                         });
                     });
@@ -177,40 +179,78 @@ export default {
         })
     },
     login(req: any, res: any) {
-        apostadorModel.findOne({ "mail": req.body.mail}).then((b) => {
+        apostadorModel.findOne({ "mail": req.body.mail }).then((b) => {
             if (b) {
-                if(b.estado != "activo"){
+                if (b.estado != "activo") {
                     res.status(400).send("cuenta no activada");
                     return;
                 }
-                apostadorModel.findOne({"mail": req.body.mail, "contraseña": sha256(req.body.contraseña)}).then((v) => {
-                    if(v){
+                apostadorModel.findOne({ "mail": req.body.mail, "contraseña": sha256(req.body.contraseña) }).then((v) => {
+                    if (v) {
                         let respuesta: JSON = JSON.parse(JSON.stringify(b));
                         Object.assign(respuesta, { "claveJWT": generarClave(req.body.mail) });
                         res.json(respuesta);
                     }
-                    else{
+                    else {
                         res.status(400).send("contraseña Incorrecta");
                     }
                 })
             }
-            else{
+            else {
                 res.status(400).send("mail no encontrado");
             }
         })
     },
-    Apostar(req: any, res: any){
-        if(!req.body.idPartido || !req.body.monto || !req.body.resultado){
-            res.status(200).send("no se proporcionaon todos los datos")
-        }
-        if(!isValidObjectId(req.body.idPartido)){
-            res.status(200).send("id de partido invalida")
+    Apostar(req: any, res: any) {
+        if (!req.body.idPartido || !req.body.monto || !req.body.golesVisitante || !req.body.golesLocal) {
+            res.status(400).send("no se proporcionaron todos los datos")
             return
         }
 
-        fetch(urlApiPartidos + "/matches/" + req.body.idPartido, {method: "GET"})
-        .then((v) => v.json())
-        .then((b) => console.log(b))
-        .catch((err: any) => console.error('error:' + err));
+        if (!isValidObjectId(req.body.idPartido)) {
+            res.status(400).send("id de partido invalida")
+            return
+        }
+
+        if (isNaN(Number(req.body.golesVisitante)) || Number(req.body.golesVisitante) < 0) {
+            res.status(400).send("formato de los goles visitantes invalido")
+            return
+        }
+
+        if (isNaN(Number(req.body.golesLocal)) || Number(req.body.golesLocal) < 0) {
+            res.status(400).send("formato de los goles locales invalido")
+            return
+        }
+
+        if (isNaN(Number(req.body.monto)) || Number(req.body.monto) < 100) {
+            res.status(400).send("monto invalido")
+            return
+        }
+
+        const mailUsuario: String = JSON.parse(JSON.stringify(jwt.verify(req.headers.authorization, process.env.JWT_SECRET!))).mail
+
+        apuestaModel.findOne({ mailUsuario: mailUsuario, idPartido: req.body.idPartido }).then((v) => {
+            console.log(v)
+            if (v) {
+                res.status(400).send("Este usuario ya aposto")
+                return
+            }
+            else {
+                fetch(urlApiPartidos + "/matches/single/" + req.body.idPartido, { method: "GET" })
+                    .then((v) => v.json())
+                    .then((b) => {
+                        let todaData: any = req.body;
+                        todaData["mailUsuario"] = mailUsuario;
+                        todaData["estado"] = "abierta";
+                        console.log(todaData)
+                        apuestaModel.create(todaData)
+                        res.send("Apuesta subida correctamente")
+                    })
+                    .catch((err: any) => {
+                        console.error('error: ' + err)
+                        res.status(400).send("Partido inexistente")
+                    });
+            }
+        })
     }
 }

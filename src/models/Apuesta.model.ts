@@ -8,10 +8,19 @@ class Apuesta {
     idPartido!: String
 
     @prop({required: true})
-    resultado!: String
+    golesVisitante!: Number
 
     @prop({required: true})
-    monto!: number
+    golesLocal!: Number
+
+    @prop({required: true})
+    monto!: Number
+
+    @prop({required: true})
+    mailUsuario!: String
+
+    @prop({required: true})
+    estado!: String
 }
 
 export const apuestaModel = getModelForClass(Apuesta)
