@@ -8,14 +8,11 @@ import { Response, Request} from 'express';
 // user
 import { IPeriodista } from '../types/periodista.type';
 import { periodistaModel } from '../models/periodista.model';
-import { Partido } from '../types/partido.type';
-import { PartidoController } from './partido.controller';
+import { IPartido, Partido } from '../types/partido.type';
 import { partidoModel } from '../models/partido.model';
 
 // env
 dotenv.config();
-
-const SALT = "1234";
 
 export class PeriodistaController {
     
@@ -81,11 +78,11 @@ export class PeriodistaController {
 
     public static addPartido(req:Request, res:Response){
         const id = req.params.id;
-        const partido: Partido = req.body.partido;
+        const id_partido = req.params.id_partido;
 
         periodistaModel.findByIdAndUpdate(
             id, 
-            { $push: { partidos: partido } }
+            { $push: { partidos: id_partido } }
         )
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json({'message': err}))
@@ -137,6 +134,63 @@ export class PeriodistaController {
         })
         .catch(err => res.status(400).json({'message': err}))
        
+    }
+
+    public static patch(req:Request, res:Response) 
+    {
+        const id = req.params.id;
+        const periodista: IPeriodista = req.body;
+
+        periodistaModel.findById(id)
+        .then(data => {
+
+            if (!data) {
+                res.status(400).json({'message': 'Periodista not found'});
+                return;
+            }
+
+            // reencriptar contraseña
+            periodista.password = PeriodistaController.sha256(periodista.password);
+
+            periodistaModel.findByIdAndUpdate(id, periodista)
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+        })
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static delete(req:Request, res:Response)
+    {
+        const id = req.params.id;
+        periodistaModel.findById(id)
+        .then(data => {
+
+            if (!data) 
+            {
+                res.status(400).json({'message': 'Periodista not found'});
+                return;
+            }
+
+            periodistaModel.findByIdAndDelete(id)
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+        })
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static getAll(req:Request, res:Response) 
+    {
+        periodistaModel.find()
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
+    }
+
+    public static getOne(req:Request, res:Response)
+    {
+        const id = req.params.id;
+        periodistaModel.findById(id)
+        .then(data => res.status(200).json(data))
+        .catch(err => res.status(400).json({'message': err}))
     }
     
 }

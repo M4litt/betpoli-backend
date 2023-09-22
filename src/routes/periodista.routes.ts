@@ -1,26 +1,17 @@
-import * as periodista                from '../middleware/auth.periodista.middleware'
-import * as admin                     from '../middleware/auth.admin.middleware'
-import { PeriodistaController }       from '../controllers/periodista.controller';
-import express, { Request, Response } from 'express';
+import * as admin from '../middleware/auth.admin.middleware'
+import { PeriodistaController } from '../controllers/periodista.controller';
+import express from 'express';
 
 export const PeriodistaRouter = express.Router();
 
 
 PeriodistaRouter
-.post('/register', PeriodistaController.register)
-.post('/login', PeriodistaController.login)
-.get('/:id/partidos', PeriodistaController.getPartidos)
-.post('/:id/partidos/', PeriodistaController.addPartido)
-.delete('/:id/partidos/', PeriodistaController.removePartido)
-
-
-// -- authorization testing --
-.get('/', (req:Request, res:Response) => {
-    res.status(200).json({"holis": "sin auth"})
-})
-.get('/auth', periodista.auth, (req:Request, res:Response) => {
-    res.status(200).json({"holis": "con periodista auth"})
-})
-.get('/admin_auth', admin.auth, (req:Request, res:Response) => {
-    res.status(200).json({"holis": "con admin-auth"})
-})
+.post('/register',                             PeriodistaController.register)
+.post('/login',                                PeriodistaController.login)
+.get('/:id/partidos',                          PeriodistaController.getPartidos)
+.get('/:id',                       admin.auth, PeriodistaController.getOne)
+.get('/',                          admin.auth, PeriodistaController.getAll)
+.post('/:id/partidos/:id_partido', admin.auth, PeriodistaController.addPartido)
+.delete('/:id',                    admin.auth, PeriodistaController.delete)
+.patch('/:id',                     admin.auth, PeriodistaController.patch)
+.delete('/:id/partidos/',          admin.auth, PeriodistaController.removePartido)

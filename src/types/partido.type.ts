@@ -15,3 +15,11 @@ export interface IPartido {
     estado:        string;
     fecha:         string;
 }
+/*
+"local": "",
+"visitante"   : "",
+"gol_local": ,
+"gol_visitante": ,
+"estado": "",
+"fecha": ""
+*/

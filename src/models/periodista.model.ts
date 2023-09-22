@@ -1,4 +1,5 @@
-import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose"
+import { getModelForClass, modelOptions, mongoose, prop } from "@typegoose/typegoose"
+import { IPartido } from "../types/partido.type";
 
 @modelOptions({
     schemaOptions: { collection: "periodistas" }
@@ -35,4 +36,4 @@ class Periodista {
     partidos: string[] = [];
 };
 
-export const periodistaModel = getModelForClass(Periodista)
+export const periodistaModel = getModelForClass(Periodista);
