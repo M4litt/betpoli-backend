@@ -12,3 +12,8 @@ main\
 ├── branch2\
 ├── brach2-dev\
 ...
+### Colecciones
+- equipos
+- partidos
+- ligas
+### IMPORTANTE: Utilizar el mismo idioma SIEMPRE para todas las colecciones (español)
