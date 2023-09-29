@@ -358,5 +358,94 @@ export default {
                 apostadorModel.create(usuario).then((c) => res.send("usuario subido correctamente"))
             })
         })
+    },
+    modify(req: any, res: any) {
+        if (!req.params.DNI) {
+            res.status(400).send("No se proporciono un DNI");
+            return;
+        }
+        if (req.params.DNI.length != 8 || isNaN(Number(req.params.DNI))) {
+            res.status(400).send("DNI invalido");
+            return;
+        }
+
+        apostadorModel.find({ DNI: req.params.DNI }).then((v) => {
+            if (v.length == 0) {
+                res.status(400).send("Usuario inexistente")
+                return
+            }
+            var query: any = {}
+            if (req.body.nombre) {
+                if (!nombreApellidoRegex.test(req.body.nombre)) {
+                    res.status(400).send("Nombre Invalido");
+                    return;
+                }
+                query["nombre"] = req.body.nombre
+            }
+            if (req.body.apellido) {
+                if (!nombreApellidoRegex.test(req.body.apellido)) {
+                    res.status(400).send("Apellido Invalido");
+                    return;
+                }
+                query["apellido"] = req.body.apellido
+            }
+            if (req.body.contraseña) {
+                if (!contraRegex.test(req.body.contraseña.valueOf())) {
+                    res.status(400).send("Contraseña insegura");
+                    return;
+                }
+                query["contraseña"] = sha256(req.body.contraseña)
+            }
+            if (req.body.estado) {
+                if (req.body.estado != "activo" && req.body.estado != "pendiente") {
+                    res.status(400).send("Estado no valido")
+                    return
+                }
+                query["estado"] = req.body.estado
+            }
+            if (req.body.fechaNac) {
+                if (!fechaRegex.test(req.body.fechaNac) || !isValidDate(req.body.fechaNac)) {
+                    console.log(fechaRegex.test(req.body.fechaNac));
+                    console.log(isValidDate(req.body.fechaNac));
+                    res.status(400).send("Fecha de nacimiento no valida");
+                    return;
+                }
+                query["fechaNac"] = req.body.fechaNac
+            }
+            if (req.body.fotoDoc) {
+                if (!fotoRegex.test(req.body.fotoDoc.valueOf())) {
+                    res.status(400).send("Imagen invalida");
+                    return;
+                }
+                query["fotoDoc"] = req.body.fotoDoc
+            }
+            if (req.body.mail) {
+                if (!mailRegex.test(req.body.mail.valueOf())) {
+                    res.status(400).send("Mail invalido");
+                    return;
+                }
+                apostadorModel.findOne({ mail: req.body.mail }).then((b) => {
+                    console.log(b)
+                    if (b != undefined && b.DNI != req.params.DNI) {
+                        res.status(400).send("mail ya en uso")
+                        return;
+                    }
+                    query["mail"] = req.body.mail
+                    console.log("query2")
+                    console.log(query)
+                    apostadorModel.updateOne({ DNI: req.params.DNI }, { $set: query }).then((v) => {
+                        res.send(v)
+                        return;
+                    })
+                })
+            }
+            else {
+                console.log("query1")
+                console.log(query)
+                apostadorModel.updateOne({ DNI: req.params.DNI }, { $set: query }).then((v) => {
+                    res.send(v)
+                })
+            }
+        })
     }
 }
