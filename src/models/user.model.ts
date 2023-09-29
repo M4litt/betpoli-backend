@@ -1,7 +1,7 @@
 import { prop, getModelForClass, modelOptions } from "@typegoose/typegoose";
 
 @modelOptions({
-    schemaOptions: {"collection": "users"}
+    schemaOptions: {"collection": "usuarios"}
 })
 class User {
     @prop({required: true})
