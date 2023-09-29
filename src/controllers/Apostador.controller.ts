@@ -5,6 +5,7 @@ import { generarClave } from "../middleware/jwt";
 import { isValidObjectId } from "mongoose";
 import { apuestaModel } from "../models/Apuesta.model";
 import jwt from "jsonwebtoken";
+import fs from "fs"
 const otpGenerator = require('otp-generator');
 export const urlApiPartidos: String = "http://172.16.255.204:6969"
 
@@ -73,7 +74,6 @@ export default {
     registro(req: any, res: any) {
         if (!req.body.contraseña || !req.body.nombre || !req.body.mail || !req.body.DNI
             || !req.body.fechaNac || !req.body.apellido || !req.body.fotoDoc) {
-            console.log(req.body)
             res.status(400).send("No se proporcionaron todos los datos");
             return;
         }
@@ -92,9 +92,9 @@ export default {
             res.status(400).send("Contraseña insegura");
             return;
         }
-
-        if (!fotoRegex.test(req.body.fotoDoc.valueOf())) {
-            res.status(400).send("Imagen invalida");
+        const foto: String = String(req.body.fotoDoc)
+        if (!fotoRegex.test(foto.split(";base64,")[1])) {
+            res.status(400).send("Imagen invalida1");
             return;
         }
 
@@ -118,6 +118,10 @@ export default {
             if (v == undefined) {
                 apostadorModel.findOne({ "mail": req.body.mail }).then((v) => {
                     if (v == undefined) {
+                        let base64image: any = foto.split(";base64,").pop()
+                        fs.writeFile("img/perfil/" + req.body.DNI + "_perfil.png", base64image, { encoding: 'base64' }, function (err) {
+                            console.log('File created');
+                        });
                         var todaladata = {
                             creado: "",
                             verify: "",
@@ -126,25 +130,14 @@ export default {
                         const temp: any = req.body;
                         temp["estado"] = "pendiente";
                         temp["contraseña"] = sha256(req.body.contraseña);
+                        temp["fotoDoc"] = "img/perfil/" + req.body.DNI + "_perfil.png"
 
                         apostadorModel.create(temp).then(data => {
                             data.save()
                             todaladata.creado = JSON.stringify(data)
                         });
-                        const configOTP = {
-                            lowerCaseAlphabets: false,
-                            upperCaseAlphabets: false,
-                            specialChars: false
-                        }
-                        const OTP = otpGenerator.generate(4, configOTP);
-                        console.log(OTP);
-
-                        apostadorVerify.create({ "mail": req.body.mail, "otp": OTP }).then(data => {
-                            data.save()
-                            todaladata.verify = JSON.stringify(data)
-                        });
                         sendMail(req.body.mail.valueOf(), "Verificacion del correo",
-                            "Tu codigo de verificacion es: " + OTP)
+                            "Pincha el enlace para activar la cuenta: http://172.16.255.233:3000/usuario/verify/" + req.body.mail)
                         todaladata.sendMail = req.body
                         res.send(todaladata);
                     }
@@ -319,9 +312,18 @@ export default {
             return;
         }
 
-        if (!fotoRegex.test(req.body.fotoDoc.valueOf())) {
-            res.status(400).send("Imagen invalida");
-            return;
+        const foto: String = String(req.body.fotoDoc)
+        if (foto.includes(",")) {
+            if (!fotoRegex.test(foto.split(",")[1])) {
+                res.status(400).send("Imagen invalida1");
+                return;
+            }
+        }
+        else {
+            if (!fotoRegex.test(foto.valueOf())) {
+                res.status(400).send("Imagen invalida2");
+                return;
+            }
         }
 
         if (!nombreApellidoRegex.test(req.body.nombre)) {
@@ -351,9 +353,15 @@ export default {
                     res.status(400).send("Mail ya en uso");
                     return;
                 }
+                let foto: String = String(req.body.fotoDoc)
+                let base64image: any = foto.split(";base64,").pop()
+                fs.writeFile("img/perfil/"+req.params.DNI + "_perfil.png", base64image, {encoding: 'base64'}, function(err) {
+                    console.log('File created');
+                });
                 const usuario: any = req.body;
                 usuario["estado"] = "pendiente";
                 usuario["contraseña"] = sha256(usuario["contraseña"]);
+                usuario["fotoDoc"] = "img/perfil/"+req.params.DNI + "_perfil.png";
                 console.log(usuario);
                 apostadorModel.create(usuario).then((c) => res.send("usuario subido correctamente"))
             })
@@ -417,7 +425,7 @@ export default {
                     res.status(400).send("Imagen invalida");
                     return;
                 }
-                query["fotoDoc"] = req.body.fotoDoc
+                query["fotoDoc"] = "img/perfil/" + req.params.DNI + "_perfil.png"
             }
             if (req.body.mail) {
                 if (!mailRegex.test(req.body.mail.valueOf())) {
@@ -434,6 +442,11 @@ export default {
                     console.log("query2")
                     console.log(query)
                     apostadorModel.updateOne({ DNI: req.params.DNI }, { $set: query }).then((v) => {
+                        let foto: String = String(req.body.fotoDoc)
+                        let base64image: any = foto.split(";base64,").pop()
+                        fs.writeFile("img/perfil/" + req.params.DNI + "_perfil.png", base64image, { encoding: 'base64' }, function (err) {
+                            console.log('File created');
+                        });
                         res.send(v)
                         return;
                     })
@@ -443,6 +456,11 @@ export default {
                 console.log("query1")
                 console.log(query)
                 apostadorModel.updateOne({ DNI: req.params.DNI }, { $set: query }).then((v) => {
+                    let foto: String = String(req.body.fotoDoc)
+                    let base64image: any = foto.split(";base64,").pop()
+                    fs.writeFile("img/perfil/" + req.params.DNI + "_perfil.png", base64image, { encoding: 'base64' }, function (err) {
+                        console.log('File created');
+                    });
                     res.send(v)
                 })
             }
