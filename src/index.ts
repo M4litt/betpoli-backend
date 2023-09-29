@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from 'body-parser';
 import mongoose from "mongoose";
 import dotenv from 'dotenv'
+import cors from 'cors'
 
 // routes
 import { rutasUsuarios } from "./routes/user.routes";
@@ -14,6 +15,10 @@ dotenv.config()
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(cors(
+    //{ origin: [`http://localhost:${PORT}`, `http://localhost:3000`], }
+));
 
 app.get("", (req, res) => res.send("Bienvenido a mi api"));
 
