@@ -1,7 +1,7 @@
 import { apostadorModel } from "../models/Apostador.model";
 import { apostadorVerify } from "../models/ApostadorVerify.model";
 import { createHash } from 'node:crypto';
-import { generarClave, verificarClave } from "../middleware/jwt";
+import { generarClave } from "../middleware/jwt";
 import { isValidObjectId } from "mongoose";
 import { apuestaModel } from "../models/Apuesta.model";
 import jwt from "jsonwebtoken";
@@ -251,6 +251,112 @@ export default {
                         res.status(400).send("Partido inexistente")
                     });
             }
+        })
+    },
+    // Alta, baja y modificacion
+    getAll(req: any, res: any) {
+        apostadorModel.find().then((v) => {
+            res.send(v);
+        })
+    },
+
+    getOne(req: any, res: any) {
+        if (!req.params.DNI) {
+            res.status(400).send("No se proporciono un DNI");
+            return;
+        }
+        if (req.params.DNI.length != 8 || isNaN(Number(req.params.DNI))) {
+            res.status(400).send("DNI invalido");
+            return;
+        }
+
+        apostadorModel.find({ DNI: req.params.DNI }).then((v) => {
+            res.send(v);
+        })
+    },
+
+    delete(req: any, res: any) {
+        if (!req.params.DNI) {
+            res.status(400).send("No se proporciono un DNI");
+            return;
+        }
+        if (req.params.DNI.length != 8 || isNaN(Number(req.params.DNI))) {
+            res.status(400).send("DNI invalido");
+            return;
+        }
+
+        apostadorModel.findOne({ DNI: req.params.DNI }).then((v) => {
+            if (v == undefined) {
+                res.status(400).send("Usuario inexistente");
+                return;
+            }
+            apostadorModel.deleteOne({ DNI: req.params.DNI }).then((b) => {
+                res.send("Usuario eliminado correctamente");
+            })
+        })
+    },
+
+    post(req: any, res: any) {
+        if (!req.body.contraseña || !req.body.nombre || !req.body.mail || !req.body.DNI
+            || !req.body.fechaNac || !req.body.apellido || !req.body.fotoDoc) {
+            console.log(req.body)
+            res.status(400).send("No se proporcionaron todos los datos");
+            return;
+        }
+
+        if (!mailRegex.test(req.body.mail.valueOf())) {
+            res.status(400).send("Mail invalido");
+            return;
+        }
+
+        if (req.body.DNI.length != 8 || isNaN(Number(req.body.DNI))) {
+            res.status(400).send("DNI invalido");
+            return;
+        }
+
+        if (!contraRegex.test(req.body.contraseña.valueOf())) {
+            res.status(400).send("Contraseña insegura");
+            return;
+        }
+
+        if (!fotoRegex.test(req.body.fotoDoc.valueOf())) {
+            res.status(400).send("Imagen invalida");
+            return;
+        }
+
+        if (!nombreApellidoRegex.test(req.body.nombre)) {
+            res.status(400).send("Nombre Invalido");
+            return;
+        }
+
+        if (!nombreApellidoRegex.test(req.body.apellido)) {
+            res.status(400).send("Apellido Invalido");
+            return;
+        }
+
+        if (!fechaRegex.test(req.body.fechaNac) || !isValidDate(req.body.fechaNac)) {
+            console.log(fechaRegex.test(req.body.fechaNac));
+            console.log(isValidDate(req.body.fechaNac));
+            res.status(400).send("Fecha de nacimiento no valida");
+            return;
+        }
+
+        apostadorModel.findOne({ DNI: req.body.DNI }).then((v) => {
+            if (v != undefined) {
+                res.status(400).send("DNI ya en uso");
+                return;
+            }
+            apostadorModel.findOne({ mail: req.body.mail }).then((b) => {
+                if (b != undefined) {
+                    res.status(400).send("Mail ya en uso");
+                    return;
+                }
+                const usuario: any = req.body;
+                usuario["estado"] = "pendiente";
+                usuario["contraseña"] = sha256(usuario["contraseña"]);
+                console.log(usuario);
+                apostadorModel.create(usuario).then((c) => res.send("usuario subido correctamente"))
+            })
         })
     }
 }
