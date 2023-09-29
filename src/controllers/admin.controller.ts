@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { IAdmin } from "../types/admin.type";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -19,6 +20,13 @@ export class AdminController
     public static register(req:Request, res:Response)
     {
         const admin:IAdmin = req.body;
+        
+        //check that password is inputted
+        if (admin.password.length == 0) {
+            res.status(400).json({ error: "Password cannot be empty" });
+            return;
+        }
+        
         
         // check if already exists/name is taken
         adminModel.findOne({ nombre: admin.nombre })
@@ -94,6 +102,12 @@ export class AdminController
     public static getOne(req:Request, res:Response)
     {
         const id = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
+
         adminModel.findById(id)
         .then((admin) => res.status(200).json(admin))
         .catch((err) => res.status(400).json(err));

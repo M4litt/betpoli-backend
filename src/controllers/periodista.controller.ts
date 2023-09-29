@@ -1,9 +1,8 @@
 import jwt    from 'jsonwebtoken'
-import bcrypt from 'bcrypt';
 import dotenv from 'dotenv'
 import { createHash } from 'node:crypto';
-
 import { Response, Request} from 'express';
+import mongoose, { mongo } from 'mongoose';
 
 // user
 import { IPeriodista } from '../types/periodista.type';
@@ -80,12 +79,31 @@ export class PeriodistaController {
         const id = req.params.id;
         const id_partido = req.params.id_partido;
 
-        periodistaModel.findByIdAndUpdate(
-            id, 
-            { $push: { partidos: id_partido } }
-        )
-        .then(data => res.status(200).json(data))
-        .catch(err => res.status(400).json({'message': err}))
+        // chequear si la id es valida, sino crashea aa
+        if (!mongoose.Types.ObjectId.isValid(id_partido)){
+            res.status(400).json({'message': 'Invalid partido id'});
+            return;
+        }
+        if (!mongoose.Types.ObjectId.isValid(id)){
+            res.status(400).json({'message': 'Invalid periodista id'});
+            return;
+        }
+
+        partidoModel.findById(id_partido)
+        .then(data => {
+            // if not found
+            if (!data) {
+                res.status(400).json({'message': 'Partido not found'});
+                return;
+            }
+            // push partido
+            periodistaModel.findByIdAndUpdate(
+                id, 
+                { $push: { partidos: id_partido } }
+            )
+            .then(data => res.status(200).json(data))
+            .catch(err => res.status(400).json({'message': err}))
+        })
     }
 
     public static getPartidos(req:Request, res:Response){
@@ -97,18 +115,9 @@ export class PeriodistaController {
                 res.status(400).json({'message': 'Periodista not found'});
                 return;
             }
-
-            let out_partidos: any[] = [];
-
-            data.partidos.forEach(partido => {
-
-                partidoModel.findById(partido)
-                .then(data => out_partidos.push(data))
-                .catch(err => res.status(400).json({'message': err}))
-                // nose si funciona esto
-
-            })
-            res.status(200).json(out_partidos)
+            PeriodistaController.getPartidosList(data.partidos)
+            .then(output => res.status(200).json(output))
+            .catch(err => res.status(400).json({'message': err}))
         })
         .catch(err => res.status(400).json({'message': err}))
     }
@@ -141,6 +150,11 @@ export class PeriodistaController {
         const id = req.params.id;
         const periodista: IPeriodista = req.body;
 
+        if (!mongoose.Types.ObjectId.isValid(id)){
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
+
         periodistaModel.findById(id)
         .then(data => {
 
@@ -162,6 +176,12 @@ export class PeriodistaController {
     public static delete(req:Request, res:Response)
     {
         const id = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)){
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
+
         periodistaModel.findById(id)
         .then(data => {
 
@@ -188,9 +208,32 @@ export class PeriodistaController {
     public static getOne(req:Request, res:Response)
     {
         const id = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)){
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
+
         periodistaModel.findById(id)
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json({'message': err}))
+    }
+
+    // habia problemas de sincronizacion asi que lo hice promesa sorry -K
+    public static getPartidosList(ids:string[]):Promise<any> 
+    {
+        return new Promise(async(resolve, reject) => {
+            let output: any[] = [];             
+            let promises:Promise<any>[] = [];   // threadpool
+            
+            ids.forEach(id => promises.push(partidoModel.findById(id)));
+            
+            await Promise.all(promises)
+            .then(data => output.push(data))
+            .catch(err => reject(err));
+
+            resolve(output);
+        })
     }
     
 }

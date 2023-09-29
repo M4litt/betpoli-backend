@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { equipoModel } from "../models/equipo.model";
 import { Equipo } from "../types/equipo.type";
+import mongoose, { mongo } from "mongoose";
 
 export class EquipoController {
 
@@ -12,6 +13,11 @@ export class EquipoController {
     
     public static getOne(req:Request, res:Response){
         const id = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
 
         equipoModel.findById(id)
         .then(data => {
@@ -59,6 +65,11 @@ export class EquipoController {
     public static remove(req:Request, res:Response){
         const id = req.params.id;
 
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
+
         equipoModel.findById(id)
         .then(data => {
 
@@ -78,7 +89,12 @@ export class EquipoController {
     public static patch(req:Request, res:Response){
         const name = req.params.nombre;
         const equipo:Equipo = req.body;
-        
+
+        if (!mongoose.Types.ObjectId.isValid(name)) {
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
+
         // get id by name
         equipoModel.findOne({nombre: name})
         .then(data => {

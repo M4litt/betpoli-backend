@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from 'body-parser';
 import mongoose from "mongoose";
 import dotenv from 'dotenv'
+
+// routes
 import { rutasUsuarios } from "./routes/user.routes";
 import { PeriodistaRouter } from "./routes/periodista.routes";
 import { equipoRouter } from "./routes/equipo.routes";
@@ -25,7 +27,6 @@ app.use('/admin',       AdminRouter);
 app.use('/partidos',    partidoRouter)
 
 mongoose
-    .set("strictQuery",  false)
-    .connect(process.env.MONGO_CON_STRING!).then(() => {
-        console.log(`> mongoDB connection initialized.`)
-    })
+.set("strictQuery",  false)
+.connect(process.env.MONGO_CON_STRING!)
+.then(() => console.log(`> mongoDB connection initialized.`))

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { partidoModel } from '../models/partido.model'
 import { IPartido } from '../types/partido.type';
+import mongoose from 'mongoose';
 
 export class PartidoController {
     public static getAll(req: Request, res: Response) {
@@ -10,7 +11,14 @@ export class PartidoController {
     }
 
     public static getOne(req: Request, res: Response) {
-        partidoModel.findById(req.params.id)
+        const id = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
+
+        partidoModel.findById(id)
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json(err));
     }
@@ -27,6 +35,11 @@ export class PartidoController {
     {
         const id = req.params.id;
         const partido:IPartido = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id)){
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
 
         partidoModel.findById(id)
         .then(data => {
@@ -46,6 +59,12 @@ export class PartidoController {
     public static delete(req:Request, res:Response)
     {
         const id = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(id)){
+            res.status(400).json({'message': 'Invalid id'});
+            return;
+        }
+
         partidoModel.findById(id)
         .then(data => {
             if (!data)

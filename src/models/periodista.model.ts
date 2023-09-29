@@ -1,5 +1,4 @@
 import { getModelForClass, modelOptions, mongoose, prop } from "@typegoose/typegoose"
-import { IPartido } from "../types/partido.type";
 
 @modelOptions({
     schemaOptions: { collection: "periodistas" }
@@ -32,6 +31,9 @@ class Periodista {
     @prop({ required: true })
     empresa_perteneciente: string = '';
 
+    // por esto de aca saltan los mensajes del principio
+    // allowmixed no existe (o por lo menos no aparece)
+    // intente todo para q no salte pero nose
     @prop({ required: false })
     partidos: string[] = [];
 };
