@@ -26,6 +26,13 @@ export class PartidoController {
     public static add(req:Request, res:Response)
     {
         const partido:IPartido = req.body;
+
+        if (partido.local == partido.visitante) 
+        {
+            res.status(400).json({'message': 'Un equipo no puede jugar contra si mismo'});
+            return;
+        }
+
         partidoModel.create(partido)
         .then(data => res.status(200).json(data))
         .catch(err => res.status(400).json(err));

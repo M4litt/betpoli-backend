@@ -32,7 +32,7 @@ class Periodista {
     empresa_perteneciente: string = '';
 
     // por esto de aca saltan los mensajes del principio
-    // allowmixed no existe (o por lo menos no aparece)
+    // allowmixed no existe como propiedad (o por lo menos no aparece)
     // intente todo para q no salte pero nose
     @prop({ required: false })
     partidos: string[] = [];
