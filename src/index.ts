@@ -12,7 +12,8 @@ import { equipoRouter }     from "./routes/equipo.routes";
 import { AdminRouter }      from "./routes/admin.routes";
 import { partidoRouter }    from "./routes/partido.routes";
 import { rutasApuestas }    from './routes/apuesta.routes';
-import { ligaRouter }       from "./routes/liga.routes";
+import { ligaRouter } from "./routes/liga.routes";
+import { paisRouter } from "./routes/pais.routes";
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app
 .use('/admin',       AdminRouter)
 .use('/partidos',    partidoRouter)
 .use('/liga',        ligaRouter)
+.use('/pais',        paisRouter)
 
 mongoose
 .set("strictQuery",  false)
