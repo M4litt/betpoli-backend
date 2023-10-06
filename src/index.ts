@@ -12,7 +12,7 @@ import { equipoRouter }     from "./routes/equipo.routes";
 import { AdminRouter }      from "./routes/admin.routes";
 import { partidoRouter }    from "./routes/partido.routes";
 import { rutasApuestas }    from './routes/apuesta.routes';
-import { ligaRouter } from "./routes/liga.routes";
+import { ligaRouter }       from "./routes/liga.routes";
 
 dotenv.config();
 
