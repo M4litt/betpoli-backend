@@ -1,0 +1,189 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Matches API to create, update, delete and get the matches",
+        "version": "1.0.0",
+        "title": "Periodista Backend (Partidos)"
+    },
+    "schemes": [
+        "http"
+    ],
+    "host": "localhost:6969",
+    "basePath": "/matches",
+    "paths": {
+        "/all": {
+            "get": {
+                "summary": "Devolver todos los partidos",
+                "description": "Devuelve todos los partidos",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Devolución exitosa",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/todosResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/single/{id}": {
+            "get": {
+                "summary": "Devolver un solo partido",
+                "description": "Devuelve un solo partido",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del partido a devolver",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/todosResponse"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Partido no encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/NotFoundResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/single/{id}/next": {
+            "post": {
+                "summary": "Actualizar el estado del partido",
+                "description": "Actualizar al siguiente estado del partido. ",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "task id that needs to be deleted",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "estado",
+                        "description": "Estado al que se quiere actualizar (OPCIONAL)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "properties": {
+                                "estado": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/todosResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status value",
+                        "schema": {
+                            "$ref": "#/definitions/InvalidResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/page/{page}": {
+            "get":{
+                "summary": "Devolver todos los partidos de una página",
+                "description": "Devuelve todos los partidos de una página",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "path",
+                        "description": "Número de página a devolver",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Devolución exitosa",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/todosResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "todosResponse": {
+            "type": "object",
+            "properties": {
+                "_id": {
+                    "type": "string"
+                },
+                "local": {
+                    "type": "string"
+                },
+                "visitante": {
+                    "type": "string"
+                },
+                "gol_local": {
+                    "type": "integer"
+                },
+                "gol_visitante": {
+                    "type": "integer"
+                },
+                "fecha": {
+                    "type": "string"
+                }
+            }
+        },
+        "NotFoundResponse": {
+            "type": "object",
+            "properties": {
+                "statusCode": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+
+        }
+    }
+}

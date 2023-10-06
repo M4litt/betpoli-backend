@@ -25,5 +25,3 @@ main\
 ├── brach2-dev\
 ├── branch-dev-apostadores+periodistas\
     ├── branch-dev-apostadores+periodistas-2\
-
-
