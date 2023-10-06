@@ -12,6 +12,7 @@
 - Ambas partes de la app se mergean a 'test' para probar compatibilidad
 - El merge a 'main' se hace cuando se verifique que 'test' anda bien
 ### Estructura:
+<sub>
 main\
 ├── test\
 ├── branch1\
@@ -20,6 +21,6 @@ main\
 ├── brach2-dev\
 ├── branch-dev-apostadores+periodistas\
     ├── branch-dev-apostadores+periodistas-2\
-
+</sub>
 
 
