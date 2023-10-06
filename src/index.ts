@@ -6,15 +6,15 @@ import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
 import * as swaggerDocument from "./swagger.json"
 
-// routes
-import { rutasUsuarios } from "./routes/user.routes";
+import { rutasUsuarios }    from "./routes/user.routes";
 import { PeriodistaRouter } from "./routes/periodista.routes";
-import { equipoRouter } from "./routes/equipo.routes";
-import { AdminRouter } from "./routes/admin.routes";
-import { partidoRouter } from "./routes/partido.routes";
-import { rutasApuestas } from './routes/apuesta.routes';
+import { equipoRouter }     from "./routes/equipo.routes";
+import { AdminRouter }      from "./routes/admin.routes";
+import { partidoRouter }    from "./routes/partido.routes";
+import { rutasApuestas }    from './routes/apuesta.routes';
+import { ligaRouter } from "./routes/liga.routes";
 
-dotenv.config()
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,7 +26,7 @@ app.listen(PORT, () => console.log(`> BetPoeli deployed on http://localhost:${PO
 app
 .use(bodyParser.json())
 .get('', (req, res) => res.send("Bienvenido a mi api"))
-.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+.use('/api-docs',    swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 .use("/apuestas",    rutasApuestas)
 .use("/usuarios",    rutasUsuarios)
 .use('/usuarios',    rutasUsuarios)
@@ -34,6 +34,7 @@ app
 .use('/equipos',     equipoRouter)
 .use('/admin',       AdminRouter)
 .use('/partidos',    partidoRouter)
+.use('/liga',        ligaRouter)
 
 mongoose
 .set("strictQuery",  false)
