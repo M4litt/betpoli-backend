@@ -1,3 +1,10 @@
+# PARA LOS DE TESTING Y FRONT
+- crear el .env afuera de /src
+- poner los datos que especifica el env.manifest
+- poner en la terminal $~ npm run dev
+- MARGA TE VOY A MATAR!!1! - Cali <{@}>
+- lean los archivos en src/routes para las rutas 
+
 # betpoli-backend
 ### Info:
 - Guardar datos sensibles en '.env'
@@ -11,4 +18,7 @@ main\
 ├── branch1-dev\
 ├── branch2\
 ├── brach2-dev\
-...
+├── branch-dev-apostadores+periodistas\
+    ├── branch-dev-apostadores+periodistas-2\
+
+

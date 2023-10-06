@@ -1,6 +1,7 @@
 import { Router } from "express";
 import bodyParser from 'body-parser';
 import ApostadorController from "../controllers/Apostador.controller";
+
 import { verificarClave } from "../middleware/jwt";
 
 export let rutasUsuarios = Router();
