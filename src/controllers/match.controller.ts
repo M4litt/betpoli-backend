@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { matchModel } from "../models/match.model";
 import matchStates from "../utils/constants/matchStates";
 import nextState from "../utils/stateSwitch";
-import createMatch from "../utils/matchCreator";
+import createMatch from "../utils/createMatch";
 import { InvalidMatchState } from "../utils/errors/errors";
 
 export default {
@@ -16,7 +16,7 @@ export default {
     },
 
     getMatchesPage: async (req: Request, res: Response) => {
-        const page = Number(req.params.page)
+        const page = Number(req.params.page) < 1 ? 1 : Number(req.params.page)
         const limit = 15
         const matches = await matchModel.find().skip((page - 1) * limit).limit(limit)
         res.status(200).send(matches)

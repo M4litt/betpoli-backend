@@ -1,27 +1,29 @@
-import { prop, getModelForClass, modelOptions } from "@typegoose/typegoose";
-import matchStates from "../utils/constants/matchStates";
+import { prop, getModelForClass, modelOptions }
+    from "@typegoose/typegoose";
+import matchStates
+    from "../utils/constants/matchStates";
 
 @modelOptions({
-    schemaOptions: {"collection": "matches"}
+    schemaOptions: {collection: "partidos"}
 })
-class Match {
+export class Match {
     @prop({required: true})
-    local!: string
+    local!:         string
 
     @prop({required: true})
-    visitante!: string
+    visitante!:     string
 
     @prop({required: true})
-    gol_local!: number
+    gol_local!:     number
 
     @prop({required: true})
     gol_visitante!: number
 
     @prop({required: true})
-    estado!: matchStates
+    estado!:        matchStates
 
     @prop({required: true})
-    fecha!: Date
+    fecha!:         Date
 }
 
 export const matchModel = getModelForClass(Match)

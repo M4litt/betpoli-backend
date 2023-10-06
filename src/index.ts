@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 //* Routers
-import { userRouter } from "./routes/user.routes";
 import { matchRouter } from "./routes/match.routes";
 
 import swaggerUi = require('swagger-ui-express');
@@ -20,7 +19,6 @@ const swaggerDocument = JSON.parse(swaggerData);
 
 app
     .use(express.json())
-    .use('/users', userRouter)
     .use('/matches', matchRouter)
     .get('/', (req, res) => {
         res.status(200).send('Conection stablished!')

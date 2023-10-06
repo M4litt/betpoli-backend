@@ -1,8 +1,9 @@
+import { Team } from "../models/team.model";
 import matchStates from "./constants/matchStates";
 
 const createMatch = (
-    local: string, 
-    visitante: string, 
+    local: Team, 
+    visitante: Team, 
     fecha: Date, 
     gol_local: number = 0, 
     gol_visitante: number = 0,
@@ -12,9 +13,9 @@ const createMatch = (
         local,
         visitante,
         fecha,
-        gol_local: 0,
-        gol_visitante: 0,
-        estado: matchStates.DEFAULT,
+        gol_local: gol_local,
+        gol_visitante: gol_visitante,
+        estado: estado,
     }
 }
 
