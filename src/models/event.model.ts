@@ -7,7 +7,7 @@ import { ObjectId } from "mongoose";
 })
 class Event {
     @prop({required: true})
-    idPartido!: string // Id del partido en el que sucede el evento.
+    idPartido!: ObjectId // Id del partido en el que sucede el evento.
 
     @prop({required: true})
     nombre!: string // Nombre del evento, ejemplo: 'goal'.

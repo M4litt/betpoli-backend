@@ -171,10 +171,14 @@ function checkBody(requestBody: any){
         minutos_parciales: 0,
     }
 
-    const ObjectId = require('mongoose').Types.ObjectId;
-    if (!ObjectId.isValid(requestBody.idPeriodista)) {
-        return 'idPeriodista'; //res.status(400).send('Invalid body: idPeriodista is not valid');
-    }
+    matchModel.findOne({_id: requestBody.idPartido}).then( data => {
+        if(data!.id != requestBody.idPeriodista) { return 'credenciales periodista' }
+    } )
+
+    //const ObjectId = require('mongoose').Types.ObjectId;
+    //if (!ObjectId.isValid(requestBody.idPeriodista)) {
+    //    return 'idPeriodista'; //res.status(400).send('Invalid body: idPeriodista is not valid');
+    //}
     
     for (const key in requestBody) {
         if (expectedBody.hasOwnProperty(key)) {
