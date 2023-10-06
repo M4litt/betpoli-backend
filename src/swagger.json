@@ -1,0 +1,221 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "API apuestas y apostador",
+        "description": "API para BetPoli",
+        "version": "0.1"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Apostador",
+            "description": "Este endpoint se encarga de manejar los datos de los apostadores"
+        },
+        {
+            "name": "Apuesta",
+            "description": "Este endpoint se encarga de manejar los datos de las apuestas"
+        }
+    ],
+    "paths": {
+        "/usuarios/all": {
+            "get": {
+                "tags": [
+                    "Apostador"
+                ],
+                "description": "Obtiene lista de todos los apostadores",
+                "responses": {
+                    "200": {
+                        "description": "(OK) lista recibida correctamente",
+                        "content": {
+                            "application/json; charset=utf-8": {
+                                "schema": {
+                                    "$ref": "listaUsuarios"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/single/{DNI}": {
+            "get": {
+                "tags": ["Apostador"],
+                "description": "Obtiene los datos de un apostador, según el DNI recibido",
+                "responses": {
+                    "200": {
+                        "description": "(OK) lista recibida correctamente",
+                        "content": {
+                            "application/json; charset=utf-8": {
+                                "schema": {
+                                    "$ref": "usuario"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "usuario": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "String",
+                        "description": "id del apostador de mongodb"
+                    },
+                    "nombre": {
+                        "type": "String",
+                        "description": "nombre del apostador"
+                    },
+                    "apellido": {
+                        "type": "String",
+                        "description": "apellido del apostador"
+                    },
+                    "DNI": {
+                        "type": "String",
+                        "description": "DNI del apostador, de 8 dígitos"
+                    },
+                    "fechaNac": {
+                        "type": "String",
+                        "description": "fecha de nacimiento del apostador (formato: YYYY-MM-DD)"
+                    },
+                    "fotoDoc": {
+                        "type": "String",
+                        "description": "foto del documento del apostador, traducida a base 64"
+                    },
+                    "mail": {
+                        "type": "String",
+                        "description": "dirección de correo del apostador, la cual debe ser válida"
+                    },
+                    "contraseña": {
+                        "type": "String",
+                        "description": "contraseña del apostador (mínimo: 8 caracteres, con 1 mayúscula y 1 número)"
+                    },
+                    "estado": {
+                        "type": "String",
+                        "description": "el estado de la cuenta, la cual puede ser activa, inactiva o pendiente"
+                    }
+                }
+            },
+            "listaUsuarios": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "_id": {
+                            "type": "String",
+                            "description": "id del apostador de mongodb"
+                        },
+                        "nombre": {
+                            "type": "String",
+                            "description": "nombre del apostador"
+                        },
+                        "apellido": {
+                            "type": "String",
+                            "description": "apellido del apostador"
+                        },
+                        "DNI": {
+                            "type": "String",
+                            "description": "DNI del apostador, de 8 dígitos"
+                        },
+                        "fechaNac": {
+                            "type": "String",
+                            "description": "fecha de nacimiento del apostador (formato: YYYY-MM-DD)"
+                        },
+                        "fotoDoc": {
+                            "type": "String",
+                            "description": "foto del documento del apostador, traducida a base 64"
+                        },
+                        "mail": {
+                            "type": "String",
+                            "description": "dirección de correo del apostador, la cual debe ser válida"
+                        },
+                        "contraseña": {
+                            "type": "String",
+                            "description": "contraseña del apostador (mínimo: 8 caracteres, con 1 mayúscula y 1 número)"
+                        },
+                        "estado": {
+                            "type": "String",
+                            "description": "el estado de la cuenta, la cual puede ser activa, inactiva o pendiente"
+                        }
+                    }
+                }
+            },
+            "apuesta": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "String",
+                        "description": "id de la apuesta de mongodb"
+                    },
+                    "idPartido": {
+                        "type": "String",
+                        "description": "id del partido sobre el cual se apuesta"
+                    },
+                    "golesVisitante": {
+                        "type": "String",
+                        "description": "cantidad de goles que se apuesta que hará el visitante"
+                    },
+                    "golesLocal": {
+                        "type": "String",
+                        "description": "cantidad de goles que se apuesta que hará el local"
+                    },
+                    "monto": {
+                        "type": "String",
+                        "description": "cantidad apostada"
+                    },
+                    "mailUsuario": {
+                        "type": "String",
+                        "description": "direccion de correo de quien hizo la apuesta"
+                    },
+                    "estado": {
+                        "type": "String",
+                        "description": "estado de la apuesta (pendiente, ganada, perdida)"
+                    }
+                }
+            },
+            "listaApuestas": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "_id": {
+                            "type": "String",
+                            "description": "id de la apuesta de mongodb"
+                        },
+                        "idPartido": {
+                            "type": "String",
+                            "description": "id del partido sobre el cual se apuesta"
+                        },
+                        "golesVisitante": {
+                            "type": "String",
+                            "description": "cantidad de goles que se apuesta que hará el visitante"
+                        },
+                        "golesLocal": {
+                            "type": "String",
+                            "description": "cantidad de goles que se apuesta que hará el local"
+                        },
+                        "monto": {
+                            "type": "String",
+                            "description": "cantidad apostada"
+                        },
+                        "mailUsuario": {
+                            "type": "String",
+                            "description": "direccion de correo de quien hizo la apuesta"
+                        },
+                        "estado": {
+                            "type": "String",
+                            "description": "estado de la apuesta (pendiente, ganada, perdida)"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
