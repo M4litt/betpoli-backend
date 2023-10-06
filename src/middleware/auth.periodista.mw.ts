@@ -20,8 +20,8 @@ export async function auth(req:Request, res:Response, next:NextFunction) {
 
         const payload = parseJwt(token)
 
-        if(!payload) {
-            res.status(401).send('Unauthorized periodista token');
+        if(!payload || !payload.mail) {
+            res.status(400).send('Bad token');
             return
         }
 
