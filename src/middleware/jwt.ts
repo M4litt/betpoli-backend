@@ -1,8 +1,10 @@
 import jwt from "jsonwebtoken";
 
-export function generarClave(nombre: String): string{
+import { apostadorModel } from "../models/Apostador.model";
+
+export function generarClave(mail: String): string{
     let dataFirma = {
-        "nombre": nombre
+        "mail": mail
     }
     let respuesta = jwt.sign(dataFirma, process.env.JWT_SECRET!, {expiresIn:'1d'});
 
@@ -18,14 +20,16 @@ export function verificarClave(req: any, res: any, next: any){
 
     try {
         const payload: any = jwt.verify(clave, process.env.JWT_SECRET!);
-        const nombreGenerado: string = payload.nombre;
 
-        const nombreSolicitud: string = req.body.nombreUsuario;
-
-        if (nombreGenerado !== nombreSolicitud) {
-            return res.status(401).send('Unauthorized: Invalid token.');
-        }
-        next();
+        
+        apostadorModel.findOne({mail: payload.mail}).then((v) => {
+            if(v){
+                next();
+            }
+            else{
+                return res.status(401).send('Unauthorized: Invalid token.');
+            }
+        })
     }
     catch (err) {
         return res.status(401).send('Unauthorized: Invalid token.');
