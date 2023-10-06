@@ -1,9 +1,9 @@
-# PARA LOS REVERENDOS HIJOS DE PUTA DE TESTING
+# PARA LOS DE TESTING Y FRONT
 - crear el .env afuera de /src
 - poner los datos que especifica el env.manifest
 - poner en la terminal $~ npm run dev
 - MARGA TE VOY A MATAR!!1! - Cali <{@}>
-- lean los archivos en /routes para las rutas (｡◕‿‿◕｡)
+- lean los archivos en src/routes para las rutas 
 
 # betpoli-backend
 ### Info:
