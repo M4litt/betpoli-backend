@@ -18,6 +18,8 @@ main\
 ├── branch1-dev\
 ├── branch2\
 ├── brach2-dev\
-...
+├── branch-dev-apostadores+periodistas\
+    ├── branch-dev-apostadores+periodistas-2\
+
 
 
