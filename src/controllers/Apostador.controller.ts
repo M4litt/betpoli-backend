@@ -1,6 +1,7 @@
 import { apostadorModel } from "../models/Apostador.model";
 import { apostadorVerify } from "../models/ApostadorVerify.model";
 import { createHash } from 'node:crypto';
+
 import { generarClave } from "../middleware/jwt";
 import { isValidObjectId } from "mongoose";
 import { apuestaModel } from "../models/Apuesta.model";
@@ -73,6 +74,7 @@ export function sha256(content: string) {
 }
 
 export default {
+
     registro(req: any, res: any) {
         if (!req.body.contraseña || !req.body.nombre || !req.body.mail || !req.body.DNI
             || !req.body.fechaNac || !req.body.apellido || !req.body.fotoDoc) {
@@ -94,6 +96,7 @@ export default {
             res.status(400).send("Contraseña insegura");
             return;
         }
+
         const foto: String = String(req.body.fotoDoc)
         if (!fotoRegex.test(foto.split(";base64,")[1])) {
             res.status(400).send("Imagen invalida1");
@@ -104,6 +107,7 @@ export default {
             res.status(400).send("Nombre Invalido");
             return;
         }
+
 
         if (!nombreApellidoRegex.test(req.body.apellido)) {
             res.status(400).send("Apellido Invalido");
@@ -122,6 +126,7 @@ export default {
             if (v == undefined) {
                 apostadorModel.findOne({ "mail": req.body.mail }).then((v) => {
                     if (v == undefined) {
+
                         let base64image: any = foto.split(";base64,").pop()
                         fs.writeFile("img/perfil/" + req.body.DNI + "_perfil.png", base64image, { encoding: 'base64' }, function (err) {
                             console.log('File created');
@@ -140,6 +145,7 @@ export default {
                             data.save()
                             todaladata.creado = JSON.stringify(data)
                         });
+    
                         sendMail(req.body.mail.valueOf(), "Verificacion del correo",
                             "Pincha el enlace para activar la cuenta: http://localhost:4200/verify/" + generarClave(req.body.mail))
                         todaladata.sendMail = req.body
@@ -155,6 +161,7 @@ export default {
             }
         })
     },
+
     verify(req: any, res: any) {
         if (!req.body.clave) {
             res.status(400).send("no se proporcionaron todos los datos");

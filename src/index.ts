@@ -1,37 +1,69 @@
-import express from "express";
-import bodyParser from 'body-parser';
-import mongoose from "mongoose";
-import dotenv from 'dotenv'
-import { rutasUsuarios } from "./routes/user.routes";
-import { sha256 } from "./controllers/Apostador.controller";
-import { rutasApuestas } from "./routes/apuesta.routes";
-import swaggerUi from 'swagger-ui-express'
-import * as swaggerDocument from "./swagger.json"
-import cors from "cors"
+// * Deps
+import express, { Request, Response } from 'express';
+import * as swaggerDocument           from './swagger.json'
+import fileUpload                     from 'express-fileupload';
+import swaggerUi                      from 'swagger-ui-express'
+import bodyParser                     from 'body-parser';
+import mongoose                       from "mongoose";
+import dotenv                         from 'dotenv'
+import cors                           from 'cors'
+// * Routers
+import { PeriodistaRouter }           from './routes/periodista.routes';
+import { partidoRouter }              from './routes/partido.routes';
+import { rutasApuestas }              from './routes/apuesta.routes';
+import { equipoRouter }               from './routes/equipo.routes';
+import { AdminRouter }                from './routes/admin.routes';
+import { rutasUsuarios }              from './routes/user.routes';
+import { ligaRouter }                 from './routes/liga.routes';
+import { paisRouter }                 from './routes/pais.routes';
+import { uploadFile } from './controllers/upload.controller';
 
-const app = express();
-const puerto = 3000;
-dotenv.config()
+dotenv.config();
 
-console.log(sha256("123"))
+const app  = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.json())
+// hay conflictos entre los swaggers
+/*
+import fs                             from "fs"
+const swaggerFile = (process.cwd()+"/swagger.json")
+const swaggerData = fs.readFileSync(swaggerFile, 'utf8')
+const swaggerDocument = JSON.parse(swaggerData)
+app
+.use('/partidos/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, undefined, undefined, undefined))
+*/
 
-app.get("", (req, res) => res.send("Bienvenido a mi api"));
+app
+.use(bodyParser.json())
+.use(cors({ origin: [`http://localhost:${PORT}`, `http://localhost:3000`], }))
 
-app.listen(puerto, () => console.log("Escuchando en el puerto: " + puerto));
+// routes
+.get('/', (req:Request, res:Response) => res.send("Bienvenido a mi api"))
+.use('/api-docs',    swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+.use("/apuestas",    rutasApuestas)
+.use("/usuarios",    rutasUsuarios)
+.use('/usuarios',    rutasUsuarios)
+.use('/periodistas', PeriodistaRouter)
+.use('/equipos',     equipoRouter)
+.use('/admin',       AdminRouter)
+.use('/partidos',    partidoRouter)
+.use('/liga',        ligaRouter)
+.use('/pais',        paisRouter)
 
-app.use(express.json());
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use(cors())
-app.use("/apuestas", rutasApuestas)
-app.use("/usuarios", rutasUsuarios);
+// file upload
+.use(fileUpload({ limits: { fileSize: 10000000 }, abortOnLimit: true }))
+.use('/public', express.static('.public'))  // fetch files using http://<HOST>:<PORT>/public/<FILE_NAME>
+.use('/upload/:foldername', uploadFile)
 
-const estados: Array<string> = ["aceptado", "rechazado", "pendiente", "noVerificado"];
-console.log(estados.some(x => x === "aceptado"))
+// init
+.listen(PORT, () => console.log(`> BetPoeli deployed on http://localhost:${PORT}`));
 
+// db
 mongoose
-    .set("strictQuery",  false)
-    .connect(process.env.MONGO_CON_STRING!).then(() => {
-        console.log(`mongoDB connection initialized.`)
-    })
+.set('strictQuery',  false)
+.connect(process.env.MONGO_CON_STRING!)
+.then(() => console.log(`> mongoDB connection initialized.`))
+
+
+
+// :3

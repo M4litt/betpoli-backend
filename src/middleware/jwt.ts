@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+
 import { apostadorModel } from "../models/Apostador.model";
 
 export function generarClave(mail: String): string{
@@ -19,6 +20,7 @@ export function verificarClave(req: any, res: any, next: any){
 
     try {
         const payload: any = jwt.verify(clave, process.env.JWT_SECRET!);
+
         
         apostadorModel.findOne({mail: payload.mail}).then((v) => {
             if(v){
