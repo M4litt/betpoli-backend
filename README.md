@@ -1,4 +1,9 @@
-# PARA LOS DE TESTING Y FRONT
+# betpoli-backend
+### Info:
+- Hacer el merge inicial de 'dev' a 'estable'
+- Ambas partes de la app se mergean a 'test' para probar compatibilidad
+- El merge a 'main' se hace cuando se verifique que 'test' anda bien
+  
 ### Inicializar
 - poner el comando $~ npm run init
 - poner los datos especificados en el /env.manifest en /.env
@@ -7,13 +12,6 @@
 ### Testear
 - poner el comando $~ npm run dev
 - lean los archivos en src/routes para las rutas 
-
-# betpoli-backend
-### Info:
-- Guardar datos sensibles en '.env'
-- Hacer el merge inicial de 'dev' a 'estable'
-- Ambas partes de la app se mergean a 'test' para probar compatibilidad
-- El merge a 'main' se hace cuando se verifique que 'test' anda bien
 
 ### Estructura:
 main\
