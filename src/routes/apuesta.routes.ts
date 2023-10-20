@@ -4,4 +4,4 @@ import ApuestaController from "../controllers/Apuesta.controller";
 
 export let rutasApuestas = Router();
 
-rutasApuestas.post("/cerrarApuestas/:idPartido", bodyParser.json(), ApuestaController.cerrarApuestas)
+rutasApuestas.post("/cerrarApuestas/:idPartido", ApuestaController.cerrarApuestas)

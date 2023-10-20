@@ -5,7 +5,7 @@ import { verificarClave } from "../middleware/jwt";
 
 export let rutasUsuarios = Router();
 
-rutasUsuarios.post("/registro", bodyParser.json(), ApostadorController.registro)
+rutasUsuarios.post("/registro", ApostadorController.registro)
     .post("/verify", ApostadorController.verify)
     .post("/inicioSesion", ApostadorController.login)
     .post("/apostar", verificarClave, ApostadorController.Apostar)

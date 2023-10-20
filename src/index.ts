@@ -15,6 +15,8 @@ dotenv.config()
 
 console.log(sha256("123"))
 
+app.use(bodyParser.json())
+
 app.get("", (req, res) => res.send("Bienvenido a mi api"));
 
 app.listen(puerto, () => console.log("Escuchando en el puerto: " + puerto));
@@ -22,8 +24,11 @@ app.listen(puerto, () => console.log("Escuchando en el puerto: " + puerto));
 app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(cors())
-app.use("/apuestas", bodyParser.json(),rutasApuestas)
-app.use("/usuarios", bodyParser.json(),rutasUsuarios);
+app.use("/apuestas", rutasApuestas)
+app.use("/usuarios", rutasUsuarios);
+
+const estados: Array<string> = ["aceptado", "rechazado", "pendiente", "noVerificado"];
+console.log(estados.some(x => x === "aceptado"))
 
 mongoose
     .set("strictQuery",  false)
