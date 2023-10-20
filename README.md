@@ -1,8 +1,11 @@
 # PARA LOS DE TESTING Y FRONT
-- crear el .env afuera de /src
-- poner los datos que especifica el env.manifest
-- poner en la terminal $~ npm run dev
+### Inicializar
+- poner el comando $~ npm run init
+- poner los datos especificados en el /env.manifest en /.env
 - MARGA TE VOY A MATAR!!1! - Cali <{@}>
+
+### Testear
+- poner el comando $~ npm run dev
 - lean los archivos en src/routes para las rutas 
 
 # betpoli-backend
@@ -11,10 +14,6 @@
 - Hacer el merge inicial de 'dev' a 'estable'
 - Ambas partes de la app se mergean a 'test' para probar compatibilidad
 - El merge a 'main' se hace cuando se verifique que 'test' anda bien
-
-Esta branch es un merge de: 
-- branch-dev-apostadores+periodistas-2/
-- branch2/
 
 ### Estructura:
 main\
@@ -25,3 +24,5 @@ main\
 ├── brach2-dev\
 ├── branch-dev-apostadores+periodistas\
     ├── branch-dev-apostadores+periodistas-2\
+
+
