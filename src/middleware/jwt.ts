@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-import { apostadorModel } from "../models/Apostador.model";
+import { apostadorModel } from "../models/apostador.model";
 
 export function generarClave(mail: String): string{
     let dataFirma = {

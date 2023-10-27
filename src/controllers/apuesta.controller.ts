@@ -1,6 +1,6 @@
 import { isValidObjectId } from "mongoose"
-import { apuestaModel } from "../models/Apuesta.model"
-import { urlApiPartidos } from "./Apostador.controller"
+import { apuestaModel } from "../models/apuesta.model"
+import { urlApiPartidos } from "./apostador.controller"
 
 export default {
     cerrarApuestas(req: any, res: any) {

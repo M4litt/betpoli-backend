@@ -1,6 +1,5 @@
 import { Router } from "express";
-import bodyParser from 'body-parser';
-import ApuestaController from "../controllers/Apuesta.controller";
+import ApuestaController from "../controllers/apuesta.controller";
 import * as admin from '../middleware/auth.admin.middleware';
 
 export let rutasApuestas = Router();

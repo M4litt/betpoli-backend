@@ -1,10 +1,10 @@
-import { apostadorModel } from "../models/Apostador.model";
-import { apostadorVerify } from "../models/ApostadorVerify.model";
+import { apostadorModel } from "../models/apostador.model";
+import { apostadorVerify } from "../models/apostadorVerify.model";
 import { createHash } from 'node:crypto';
 
 import { generarClave } from "../middleware/jwt";
 import { isValidObjectId } from "mongoose";
-import { apuestaModel } from "../models/Apuesta.model";
+import { apuestaModel } from "../models/apuesta.model";
 import jwt from "jsonwebtoken";
 import fs from "fs"
 const otpGenerator = require('otp-generator');
