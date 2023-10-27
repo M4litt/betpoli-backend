@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { eventModel } from "../models/event.model";
 import { matchModel } from "../models/match.model";
-import { ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 import { verify } from "crypto";
+import { periodistaModel } from "../models/periodista.model";
 
 /*
     getGlobalEvents: Terminado. 200 y 404
@@ -54,7 +55,7 @@ export default {
     },
 
     createEvent: async (req: Request, res: Response) => {
-        
+        const timestampInMilis  = new Date().getTime();
         try {
             const existingPartido = await matchModel.findById(req.body.idPartido);
             if (!existingPartido) {
@@ -64,7 +65,7 @@ export default {
             else {
                 const existingEvent = await eventModel.findOne({
                     idPartido:req.body.idPartido,
-                    timestamp:req.body.timestamp
+                    timestamp:timestampInMilis
                 });
 
                 if (existingEvent) {
@@ -79,14 +80,18 @@ export default {
                     
                     const result = checkBody(req.body);
 
-                    if (typeof result == 'string') {
-                        return res.status(400).send('Invalid body: '+result+' is not valid');
+                    if (result != 0) {
+                        res.status(400).send('Invalid body: '+result+' is not valid');
+                        return;
                     }
-
-                    const timestampInMilis  = new Date().getTime();
                     
                     req.body.timestamp = timestampInMilis;
                     req.body.fueAnulado = false;
+
+                    const periodista = await periodistaModel.findOne(res.locals.decodedJWT);
+                    const objectIdStr = periodista!._id.toString();
+                    req.body.idPeriodista = objectIdStr;
+                    
                     const newEvent = await eventModel.create(req.body);
                     if(newEvent.nombre == 'gol'){
                         addGoals(newEvent);
@@ -96,7 +101,7 @@ export default {
                 } 
             }
         } catch (error) {
-            console.error("Error al crear el evento");
+            console.error("Error al crear el evento", error);
             return res.status(500).send("Ocurrio un error al crear el evento");
         } 
 
@@ -167,18 +172,8 @@ function checkBody(requestBody: any){
         nombre: '',
         equipo: '',
         minutos_totales: 0,
-        estado_partido: '',
         minutos_parciales: 0,
     }
-
-    matchModel.findOne({_id: requestBody.idPartido}).then( data => {
-        if(data!.id != requestBody.idPeriodista) { return 'credenciales periodista' }
-    } )
-
-    //const ObjectId = require('mongoose').Types.ObjectId;
-    //if (!ObjectId.isValid(requestBody.idPeriodista)) {
-    //    return 'idPeriodista'; //res.status(400).send('Invalid body: idPeriodista is not valid');
-    //}
     
     for (const key in requestBody) {
         if (expectedBody.hasOwnProperty(key)) {

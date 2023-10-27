@@ -14,6 +14,7 @@ const matchStatesFlow: any = {
 }
 
 const nextState = (currentState: matchStates, optionalState: matchStates | undefined = undefined) => {
+    currentState = currentState.toUpperCase() as matchStates
     if (!matchStatesFlow[currentState]) throw new Error('Invalid state')
     
     if (optionalState) {

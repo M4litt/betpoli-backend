@@ -22,9 +22,6 @@ class Event {
     minutos_totales!: number // Total del evento transcurso del evento.
 
     @prop({required: true})
-    estado_partido!: matchStates // Estado del partido en el evento?
-
-    @prop({required: true})
     minutos_parciales!: number // Tiempo parcial en el transcurso del evento (fh o sh).
 
     @prop({required: true})

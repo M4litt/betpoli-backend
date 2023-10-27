@@ -6,6 +6,7 @@ import createObjMatch from "../utils/matchCreator";
 import { InvalidMatchState } from "../utils/errors/invalidMatchState";
 import matchStates from "../utils/constants/matchStates";
 import createMatch from "../utils/createMatch";
+import { periodistaModel } from "../models/periodista.model";
 
 export default {
     placeholder: (req: Request, res: Response) => {
@@ -55,6 +56,9 @@ export default {
             return res.status(404).send("Match not found")
         }
 
+        const periodista = await periodistaModel.findOne(res.locals.decodedJWT);
+        const objectIdStr = periodista!._id.toString();
+
         const optional_state_raw = req.body.estado
         console.log(optional_state_raw)
 
@@ -70,9 +74,10 @@ export default {
             return res.status(304).send("Match already in that state")
 
         try {
+            console.log(match.estado)
             const updatedMatch = await matchModel.findByIdAndUpdate(
                 req.params.id,
-                {estado: optional_state_raw ? nextState(match.estado, optional_state) : nextState(match.estado)},
+                {estado: optional_state_raw != undefined ? nextState(match.estado, optional_state) : nextState(match.estado)},
                 {new: true}
             )
 
@@ -85,11 +90,10 @@ export default {
                 nombre: "matchStateChange",
                 equipo: "none",
                 timestamp: Date.now(),
-                minutos_totales: 0,
-                estado_partido: updatedMatch.estado,
-                minutos_parciales: 0,
+                minutos_totales: -1,
+                minutos_parciales: -1,
                 fueAnulado: false,
-                idPeriodista: updatedMatch.id
+                idPeriodista: objectIdStr
             })
           
             console.log(updatedMatch)
@@ -106,23 +110,4 @@ export default {
 
         
     }
-    // updateMatch: async (req: Request, res: Response) => {
-    //     try {
-    //       const { id } = req.params;
-    //       const updatedMatch = await matchModel.findOneAndUpdate({
-    //         id: id,
-    //       }, req.body, {
-    //         new: true,
-    //       });
-    
-    //       if (!updatedMatch) {
-    //         return res.status(404).send("Match not found");
-    //       }
-    
-    //       res.status(200).send(updatedMatch);
-    //     } catch (error) {
-    //       console.error("Error updating match:", error);
-    //       res.status(500).send("An error occurred while updating the match");
-    //     }
-    // },
 }

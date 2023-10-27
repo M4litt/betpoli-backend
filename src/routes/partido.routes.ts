@@ -1,12 +1,13 @@
-import express from 'express';
-import { PartidoController } from '../controllers/partido.controller';
-import * as admin from '../middleware/auth.admin.middleware';
+import express from "express";
+import matchController from "../controllers/match.controller";
+import { auth } from "../middleware/auth.periodista.mw";
 
-export const partidoRouter = express.Router();
+export const partidoRouter = express.Router()
 
 partidoRouter
-.get   ('/',                PartidoController.getAll)
-.get   ('/:id',             PartidoController.getOne)
-.post  ('/',    admin.auth, PartidoController.add)
-.patch ('/:id', admin.auth, PartidoController.patch)
-.delete('/:id', admin.auth, PartidoController.delete)
+    .get('/', matchController.getMatches)
+    .post('/', matchController.createMatch)
+    .get('/all', matchController.getMatches)
+    .get('/page/:page', matchController.getMatchesPage)
+    .get('/single/:id', matchController.getMatch)
+    .post('/single/:id/next', auth, matchController.nextState)

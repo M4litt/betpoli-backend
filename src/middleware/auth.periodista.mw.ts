@@ -29,6 +29,7 @@ export async function auth(req:Request, res:Response, next:NextFunction) {
             if(!data) {
                 res.status(401).send('Unauthorized periodista token');
             } else {
+                res.locals.decodedJWT = data;
                 next();
             }
         })

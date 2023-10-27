@@ -5,7 +5,6 @@ import mongoose from "mongoose"
 import dotenv from 'dotenv'
 import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
-import * as swaggerDocument from "./swagger.json"
 import fs from "fs"
 
 //* Routers
@@ -17,6 +16,7 @@ import { partidoRouter }    from "./routes/partido.routes"
 import { rutasApuestas }    from './routes/apuesta.routes'
 import { ligaRouter }       from "./routes/liga.routes"
 import { paisRouter }       from "./routes/pais.routes"
+import { eventRouter } from "./routes/event.routes"
 
 dotenv.config()
 
@@ -42,9 +42,10 @@ app
   .use('/partidos/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, undefined, undefined, undefined))
   .use('/liga',        ligaRouter)
   .use('/pais',        paisRouter)
+  .use('/events',      eventRouter)
   .listen(PORT, () => console.log(`> BetPoeli deployed on http://localhost:${PORT}`))
 
 mongoose
   .set("strictQuery",  false)
-  .connect(process.env.MONGO_CON_STRING!)
+  .connect(process.env.DB_CON_STR!)
   .then(() => console.log(`> mongoDB connection initialized.`))
