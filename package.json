@@ -31,7 +31,7 @@
     "express": "^4.18.2",
     "mongoose": "^7.3.2",
     "swagger-jsdoc": "^6.2.8",
- Matches dev   "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0"
     "mongoose": "^7.4.2",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",

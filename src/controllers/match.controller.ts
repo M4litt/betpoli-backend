@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import { matchModel } from "../models/match.model";
-import matchStates from "../utils/constants/matchStates";
+import { eventModel } from "../models/event.model";
 import nextState from "../utils/stateSwitch";
+import createObjMatch from "../utils/matchCreator";
+import { InvalidMatchState } from "../utils/errors/invalidMatchState";
+import matchStates from "../utils/constants/matchStates";
 import createMatch from "../utils/createMatch";
-import { InvalidMatchState } from "../utils/errors/errors";
 
 export default {
     placeholder: (req: Request, res: Response) => {
@@ -54,7 +56,6 @@ export default {
         }
 
         const optional_state_raw = req.body.estado
-
         console.log(optional_state_raw)
 
         // Check if the state is present
@@ -62,7 +63,6 @@ export default {
             if (Object.values(matchStates).some((state: string) => state === optional_state_raw))
                 return res.status(400).send("Invalid state")
         }
-
 
         const optional_state: matchStates = <matchStates> String(req.body.estado).toUpperCase();
 
@@ -79,7 +79,19 @@ export default {
             if (!updatedMatch) {
                 return res.status(404).send("Match not found")
             }
-    
+
+            eventModel.create({
+                idPartido: updatedMatch._id,
+                nombre: "matchStateChange",
+                equipo: "none",
+                timestamp: Date.now(),
+                minutos_totales: 0,
+                estado_partido: updatedMatch.estado,
+                minutos_parciales: 0,
+                fueAnulado: false,
+                idPeriodista: updatedMatch.id
+            })
+          
             console.log(updatedMatch)
             res.status(200).send(updatedMatch)
 
