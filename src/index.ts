@@ -29,7 +29,7 @@ const swaggerDocument = JSON.parse(swaggerData)
 
 app
   .use(express.json())
-  .use(cors({ origin: [`http://localhost:${PORT}`, `http://localhost:3000`], }))
+  .use(cors())
   .get('', (req, res) => res.send("Bienvenido a mi api"))
   .use('/api-docs',    swaggerUi.serve, swaggerUi.setup(swaggerDocument))
   .use("/apuestas",    rutasApuestas)
