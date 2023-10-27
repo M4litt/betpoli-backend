@@ -5,6 +5,8 @@ export const matchRouter = express.Router()
 
 matchRouter
     .get('/', matchController.getMatches)
-    .get('/:id', matchController.getMatch)
-    .get('/all', matchController.getMatches)
     .post('/', matchController.createMatch)
+    .get('/all', matchController.getMatches)
+    .get('/page/:page', matchController.getMatchesPage)
+    .get('/single/:id', matchController.getMatch)
+    .post('/single/:id/next', matchController.nextState)

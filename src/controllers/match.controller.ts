@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { matchModel } from "../models/match.model";
 import { eventModel } from "../models/event.model";
-import matchStates from "../utils/constants/matchStates";
 import nextState from "../utils/stateSwitch";
 import createObjMatch from "../utils/matchCreator";
 import { InvalidMatchState } from "../utils/errors/invalidMatchState";
+import matchStates from "../utils/constants/matchStates";
+import createMatch from "../utils/createMatch";
 
 export default {
     placeholder: (req: Request, res: Response) => {
@@ -16,13 +17,31 @@ export default {
         res.status(200).send(matches)
     },
 
+    getMatchesPage: async (req: Request, res: Response) => {
+        const page = Number(req.params.page) < 1 ? 1 : Number(req.params.page)
+        const limit = 15
+        const matches = await matchModel.find().skip((page - 1) * limit).limit(limit)
+        res.status(200).send(matches)
+    },
+
     getMatch: async (req: Request, res: Response) => {
-        const match = await matchModel.findById(req.params.id)
-        res.status(200).send(match)
+        try {
+            const match = await matchModel.findById(req.params.id)
+            res.status(200).send(match)
+        } catch (error: any) {
+            console.error("Error getting match:", error);
+            if (error.name === "CastError") {
+                res.status(404).send({
+                    statusCode: 404,
+                    message: "Match not found",
+                    id: error.value
+                })
+            }
+        }
     },
 
     createMatch: async (req: Request, res: Response) => {
-        const match = await matchModel.create(createObjMatch(
+        const match = await matchModel.create(createMatch(
             req.body.local,
             req.body.visitante,
             req.body.fecha
@@ -37,9 +56,13 @@ export default {
         }
 
         const optional_state_raw = req.body.estado
+        console.log(optional_state_raw)
 
-        if (Object.values(matchStates).some((state: string) => state === optional_state_raw))
-            return res.status(400).send("Invalid state")
+        // Check if the state is present
+        if (optional_state_raw !== undefined){
+            if (Object.values(matchStates).some((state: string) => state === optional_state_raw))
+                return res.status(400).send("Invalid state")
+        }
 
         const optional_state: matchStates = <matchStates> String(req.body.estado).toUpperCase();
 
@@ -68,7 +91,7 @@ export default {
                 fueAnulado: false,
                 idPeriodista: updatedMatch.id
             })
-
+          
             console.log(updatedMatch)
             res.status(200).send(updatedMatch)
 

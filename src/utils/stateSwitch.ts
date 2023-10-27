@@ -1,5 +1,5 @@
 import matchStates from "./constants/matchStates";
-import { InvalidMatchState } from "./errors/invalidMatchState";
+import { InvalidMatchState } from "../utils/errors/errors";
 
 const matchStatesFlow: any = {
     [matchStates.NOT_STARTED]: [matchStates.FIRST_HALF, matchStates.POSTPONED, matchStates.SUSPENDED],
