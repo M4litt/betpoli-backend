@@ -20,13 +20,8 @@ export class AdminController
     public static register(req:Request, res:Response)
     {
         const admin:IAdmin = req.body;
-        
-        //check that password is inputted
-        if (admin.password.length == 0) {
-            res.status(400).json({ error: "Password cannot be empty" });
-            return;
-        }
-        
+
+        if (!admin.nombre || !admin.password) return res.status(400).json({ error: "Admin cannot be empty" });
         
         // check if already exists/name is taken
         adminModel.findOne({ nombre: admin.nombre })
