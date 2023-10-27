@@ -61,3 +61,14 @@ export async function uploadFile(req:Request, res:Response)
     })
     .catch(err => res.status(500).send(`Error interno del servidor: ${err}`));
 }
+
+/* 
+.html
+<!-- para los de testing: -->
+
+<form action="http://localhost:<PORT>/upload/<FOLDER>/<ID>" method="POST" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*">
+    <button type="submit">Upload Image</button>
+</form>
+
+*/
