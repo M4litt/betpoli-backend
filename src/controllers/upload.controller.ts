@@ -6,7 +6,7 @@ import { equipoModel }       from '../models/equipo.model';
 import { ligaModel }         from '../models/liga.model';
 import { paisModel }         from '../models/pais.model';
 
-// la estructura es: /.public/<carpeta>/<id>.<file-extension>
+// path: ./.public/<carpeta>/<id>.<file-extension>
 
 export async function uploadFile(req:Request, res:Response)
 {
