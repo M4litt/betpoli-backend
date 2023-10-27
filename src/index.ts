@@ -52,7 +52,7 @@ app
 
 // file upload
 .use(fileUpload({ limits: { fileSize: 10000000 }, abortOnLimit: true }))
-.use('/public', express.static('.public'))  // fetch files using http://<HOST>:<PORT>/public/<FILE_NAME>
+.use('/public', express.static('.public'))  // fetch files using http://<HOST>:<PORT>/public/<FOLDER-NAME>/<FILENAME>
 .use('/upload/:foldername', uploadFile)
 
 // init
