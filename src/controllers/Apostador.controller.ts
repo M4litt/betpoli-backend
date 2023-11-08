@@ -5,10 +5,12 @@ import { createHash } from 'node:crypto';
 import { generarClave } from "../middleware/jwt";
 import { isValidObjectId } from "mongoose";
 import { apuestaModel } from "../models/Apuesta.model";
-import jwt from "jsonwebtoken";
+import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import fs from "fs"
 const otpGenerator = require('otp-generator');
 export const urlApiPartidos: String = "http://172.16.255.204:6969"
+
+const estados: Array<string> = ["aceptado", "rechazado", "pendiente", "noVerificado"];
 
 function isValidDate(dateString: string): boolean {
     const dateParts = dateString.split("-");
@@ -47,7 +49,7 @@ const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     auth: {
         user: 'pedrothedeveloper@gmail.com',
-        pass: 'vwltcggubmcxserj',
+        pass: 'znxs jmzn gefs mwdi ',
     },
     secure: true,
 });
@@ -118,6 +120,8 @@ export default {
             return;
         }
 
+        console.log(req.body)
+
         apostadorModel.findOne({ "DNI": req.body.DNI }).then((v) => {
             if (v == undefined) {
                 apostadorModel.findOne({ "mail": req.body.mail }).then((v) => {
@@ -133,7 +137,7 @@ export default {
                             sendMail: ""
                         }
                         const temp: any = req.body;
-                        temp["estado"] = "pendiente";
+                        temp["estado"] = "activo";
                         temp["contraseña"] = sha256(req.body.contraseña);
                         temp["fotoDoc"] = "img/perfil/" + req.body.DNI + "_perfil.png"
 
@@ -143,7 +147,7 @@ export default {
                         });
     
                         sendMail(req.body.mail.valueOf(), "Verificacion del correo",
-                            "Pincha el enlace para activar la cuenta: http://172.16.255.233:3000/usuario/verify/" + req.body.mail)
+                            "Pincha el enlace para activar la cuenta: http://localhost:4200/verify/" + generarClave(req.body.mail))
                         todaladata.sendMail = req.body
                         res.send(todaladata);
                     }
@@ -159,27 +163,32 @@ export default {
     },
 
     verify(req: any, res: any) {
-        apostadorVerify.findOne({ "mail": req.body.mail }).then((v) => {
-            if (v == undefined) {
-                res.status(400).send("Mail no encontrado");
-                return;
-            }
-            else {
-                if (v.otp == req.body.otp) {
-                    apostadorModel.findOneAndUpdate({ "mail": req.body.mail }, { $set: { "estado": "activo" } }).then((b) => {
-                        apostadorVerify.deleteOne({ "mail": req.body.mail }).then((p) => {
-                            res.send("Verificacion correcta");
-                        });
-                    });
+        if (!req.body.clave) {
+            res.status(400).send("no se proporcionaron todos los datos");
+            return;
+        }
+        console.log("quizas-------------------------")
+        if (jwt.verify(req.body.clave, process.env.JWT_SECRET!)) {
+            console.log("si-------------------------")
+            const mail = JSON.parse(JSON.stringify((jwt.verify(req.body.clave, process.env.JWT_SECRET!)))).mail
+            console.log(mail)
+            apostadorModel.findOne({ mail: mail }).then((v) => {
+                console.log("ojo--------------------")
+                if (!v) {
+                    res.status(400).send("Mail no encontrado");
+                    return;
                 }
-                else {
-                    res.status(400).send("Codigo incorrecto");
-                }
-            }
-        })
+                apostadorModel.findOneAndUpdate({ mail: mail }, { $set: { estado: "pendiente" } }).then((b) => {
+                    console.log("yes--------------------")
+                    res.send("Verificacion correcta");
+                });
+            })
+        }
     },
 
     login(req: any, res: any) {
+        console.log(req)
+        console.log(req.body)
         apostadorModel.findOne({ "mail": req.body.mail }).then((b) => {
             if (b) {
                 if (b.estado != "activo") {
@@ -254,7 +263,7 @@ export default {
             }
         })
     },
-    // Alta, baja y modificacion
+    // Alta, baja y modificacion !!!
     getAll(req: any, res: any) {
         apostadorModel.find().then((v) => {
             res.send(v);
@@ -363,13 +372,13 @@ export default {
                 }
                 let foto: String = String(req.body.fotoDoc)
                 let base64image: any = foto.split(";base64,").pop()
-                fs.writeFile("img/perfil/"+req.params.DNI + "_perfil.png", base64image, {encoding: 'base64'}, function(err) {
+                fs.writeFile("img/perfil/" + req.params.DNI + "_perfil.png", base64image, { encoding: 'base64' }, function (err) {
                     console.log('File created');
                 });
                 const usuario: any = req.body;
                 usuario["estado"] = "pendiente";
                 usuario["contraseña"] = sha256(usuario["contraseña"]);
-                usuario["fotoDoc"] = "img/perfil/"+req.params.DNI + "_perfil.png";
+                usuario["fotoDoc"] = "img/perfil/" + req.params.DNI + "_perfil.png";
                 console.log(usuario);
                 apostadorModel.create(usuario).then((c) => res.send("usuario subido correctamente"))
             })
@@ -413,7 +422,8 @@ export default {
                 query["contraseña"] = sha256(req.body.contraseña)
             }
             if (req.body.estado) {
-                if (req.body.estado != "activo" && req.body.estado != "pendiente") {
+                console.log(req.body.estado)
+                if (!estados.some(x => x === req.body.estado)) {
                     res.status(400).send("Estado no valido")
                     return
                 }
@@ -450,11 +460,13 @@ export default {
                     console.log("query2")
                     console.log(query)
                     apostadorModel.updateOne({ DNI: req.params.DNI }, { $set: query }).then((v) => {
-                        let foto: String = String(req.body.fotoDoc)
-                        let base64image: any = foto.split(";base64,").pop()
-                        fs.writeFile("img/perfil/" + req.params.DNI + "_perfil.png", base64image, { encoding: 'base64' }, function (err) {
-                            console.log('File created');
-                        });
+                        if (req.body.fotoDoc) {
+                            let foto: String = String(req.body.fotoDoc)
+                            let base64image: any = foto.split(";base64,").pop()
+                            fs.writeFile("img/perfil/" + req.params.DNI + "_perfil.png", base64image, { encoding: 'base64' }, function (err) {
+                                console.log('File created');
+                            });
+                        }
                         res.send(v)
                         return;
                     })
