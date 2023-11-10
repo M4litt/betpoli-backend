@@ -1,5 +1,5 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose"
-import { Equipo } from "../models/equipo.model";
+import { Team } from "../models/team.model";
 import { Pais } from "./pais.model";
 
 
@@ -14,7 +14,7 @@ export class Liga {
     pais!:      Pais;
 
     @prop({required: true})
-    equipos!:   Array<Equipo>;
+    equipos!:   Array<Team>;
 
     @prop({required: true})
     escudo!:    string;

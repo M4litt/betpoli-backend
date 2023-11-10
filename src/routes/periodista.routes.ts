@@ -2,10 +2,10 @@ import * as admin from '../middleware/auth.admin.middleware'
 import { PeriodistaController } from '../controllers/periodista.controller';
 import express from 'express';
 
-export const PeriodistaRouter = express.Router();
+export const periodistaRouter = express.Router();
 
 
-PeriodistaRouter
+periodistaRouter
 .post  ('/register',                             PeriodistaController.register)
 .post  ('/login',                                PeriodistaController.login)
 .get   ('/:id/partidos',                         PeriodistaController.getPartidos)

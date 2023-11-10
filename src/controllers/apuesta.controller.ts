@@ -2,8 +2,8 @@ import { isValidObjectId } from "mongoose"
 import { apuestaModel } from "../models/apuesta.model"
 import { urlApiPartidos } from "./apostador.controller"
 
-export default {
-    cerrarApuestas(req: any, res: any) {
+export class ApuestaController {
+    public static cerrarApuestas(req: any, res: any) {
         if (!req.params.idPartido) {
             res.status(400).send("no se enviaron todos los datos")
             return

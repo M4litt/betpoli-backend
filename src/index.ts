@@ -8,42 +8,38 @@ import swaggerUi from 'swagger-ui-express'
 import fs from "fs"
 
 //* Routers
-import { rutasUsuarios }    from "./routes/user.routes"
-import { PeriodistaRouter } from "./routes/periodista.routes"
+import { periodistaRouter } from "./routes/periodista.routes"
 import { equipoRouter }     from "./routes/equipo.routes"
 import { AdminRouter }      from "./routes/admin.routes"
 import { partidoRouter }    from "./routes/partido.routes"
-import { rutasApuestas }    from './routes/apuesta.routes'
 import { ligaRouter }       from "./routes/liga.routes"
-import { paisRouter }       from "./routes/pais.routes"
-import { eventRouter } from "./routes/event.routes"
+import { apostadorRouter } from "./routes/apostador.routes"
 
 dotenv.config()
 
 const app = express()
-const PORT = process.env.PORT || 3000
+const API_PORT = process.env.API_PORT || 3000
+const API_DOMAIN = process.env.API_DOMAIN || "localhost"
+const API_PROTOCOL = process.env.API_PROTOCOL || "http"
 
 const swaggerFile = (process.cwd()+"/swagger.json")
 const swaggerData = fs.readFileSync(swaggerFile, 'utf8')
 const swaggerDocument = JSON.parse(swaggerData)
 
 app
-  .use(express.json())
-  .use(cors())
-  .get('', (req, res) => res.send("Bienvenido a mi api"))
-  .use('/api-docs',    swaggerUi.serve, swaggerUi.setup(swaggerDocument))
-  .use("/apuestas",    rutasApuestas)
-  .use("/usuarios",    rutasUsuarios)
-  .use('/usuarios',    rutasUsuarios)
-  .use('/periodistas', PeriodistaRouter)
-  .use('/equipos',     equipoRouter)
-  .use('/admin',       AdminRouter)
-  .use('/partidos',    partidoRouter)
-  .use('/partidos/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, undefined, undefined, undefined))
-  .use('/liga',        ligaRouter)
-  .use('/pais',        paisRouter)
-  .use('/events',      eventRouter)
-  .listen(PORT, () => console.log(`> BetPoeli deployed on http://localhost:${PORT}`))
+  .use  (express.json())
+  .use  (cors())
+
+  .use  ('/api-doc',      swaggerUi.serve,  swaggerUi.setup       (swaggerDocument))
+  .use  ('/periodistas',  periodistaRouter) .use('/journalists',  periodistaRouter)
+  .use  ("/apostadores",  apostadorRouter)  .use("/gamblers",     apostadorRouter)
+  .use  ('/partidos',     partidoRouter)    .use('/matches',      partidoRouter)
+  .use  ('/equipos',      equipoRouter)     .use('/teams',        equipoRouter)
+  .use  ('/ligas',        ligaRouter)       .use('/leagues',      ligaRouter)
+  .use  ('/admin',        AdminRouter)
+
+  // .use('/pais',        paisRouter)
+  .listen(API_PORT, () => console.log(`> BetPoli deployed on ${API_PROTOCOL}://${API_DOMAIN}:${API_PORT}`))
 
 mongoose
   .set("strictQuery",  false)

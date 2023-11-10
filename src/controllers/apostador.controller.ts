@@ -8,7 +8,7 @@ import { apuestaModel } from "../models/apuesta.model";
 import jwt from "jsonwebtoken";
 import fs from "fs"
 const otpGenerator = require('otp-generator');
-export const urlApiPartidos: String = "http://172.16.255.204:6969"
+export const urlApiPartidos: String = `${process.env.API_PROTOCOL}://${process.env.API_DOMAIN}:${process.env.API_PORT}`;
 
 function isValidDate(dateString: string): boolean {
     const dateParts = dateString.split("-");
@@ -46,15 +46,15 @@ const transporter = nodemailer.createTransport({
     port: 465,
     host: "smtp.gmail.com",
     auth: {
-        user: 'pedrothedeveloper@gmail.com',
-        pass: 'vwltcggubmcxserj',
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD,
     },
     secure: true,
 });
 
 function sendMail(to: String, subject: String, text: String) {
     const mailData = {
-        from: "pedroTheDeveloper@gmail.com",
+        from: process.env.NODEMAILER_EMAIL,
         subject: subject,
         to: to,
         text: text,
@@ -71,9 +71,9 @@ export function sha256(content: string) {
     return createHash('sha256').update(content).digest('hex')
 }
 
-export default {
+export class ApostadorController {
 
-    registro(req: any, res: any) {
+    public static registro(req: any, res: any) {
         if (!req.body.contraseña || !req.body.nombre || !req.body.mail || !req.body.DNI
             || !req.body.fechaNac || !req.body.apellido || !req.body.fotoDoc) {
             res.status(400).send("No se proporcionaron todos los datos");
@@ -97,7 +97,7 @@ export default {
 
         const foto: String = String(req.body.fotoDoc)
         if (!fotoRegex.test(foto.split(";base64,")[1])) {
-            res.status(400).send("Imagen invalida1");
+            res.status(400).send("Imagen invalida");
             return;
         }
 
@@ -142,8 +142,11 @@ export default {
                             todaladata.creado = JSON.stringify(data)
                         });
     
-                        sendMail(req.body.mail.valueOf(), "Verificacion del correo",
-                            "Pincha el enlace para activar la cuenta: http://172.16.255.233:3000/usuario/verify/" + req.body.mail)
+                        sendMail(
+                            req.body.mail.valueOf(), 
+                            "Verificacion del correo",
+                            `Pincha el enlace para activar la cuenta: ${process.env.API_PROTOCOL}://${process.env.API_DOMAIN}:${process.env.API_PORT}/usuario/verify/${req.body.mail}`
+                        )
                         todaladata.sendMail = req.body
                         res.send(todaladata);
                     }
@@ -156,9 +159,9 @@ export default {
                 res.status(400).send("DNI ya en uso");
             }
         })
-    },
+    }
 
-    verify(req: any, res: any) {
+    public static verify(req: any, res: any) {
         apostadorVerify.findOne({ "mail": req.body.mail }).then((v) => {
             if (v == undefined) {
                 res.status(400).send("Mail no encontrado");
@@ -177,9 +180,9 @@ export default {
                 }
             }
         })
-    },
+    }
 
-    login(req: any, res: any) {
+    public static login(req: any, res: any) {
         apostadorModel.findOne({ "mail": req.body.mail }).then((b) => {
             if (b) {
                 if (b.estado != "activo") {
@@ -201,8 +204,8 @@ export default {
                 res.status(400).send("mail no encontrado");
             }
         })
-    },
-    Apostar(req: any, res: any) {
+    }
+    public static apostar(req: any, res: any) {
         if (!req.body.idPartido || !req.body.monto || !req.body.golesVisitante || !req.body.golesLocal) {
             res.status(400).send("no se proporcionaron todos los datos")
             return
@@ -253,15 +256,16 @@ export default {
                     });
             }
         })
-    },
+    }
+
     // Alta, baja y modificacion
-    getAll(req: any, res: any) {
+    public static getAll(req: any, res: any) {
         apostadorModel.find().then((v) => {
             res.send(v);
         })
-    },
+    }
 
-    getOne(req: any, res: any) {
+    public static getOne(req: any, res: any) {
         if (!req.params.DNI) {
             res.status(400).send("No se proporciono un DNI");
             return;
@@ -274,9 +278,9 @@ export default {
         apostadorModel.find({ DNI: req.params.DNI }).then((v) => {
             res.send(v);
         })
-    },
+    }
 
-    delete(req: any, res: any) {
+    public static delete(req: any, res: any) {
         if (!req.params.DNI) {
             res.status(400).send("No se proporciono un DNI");
             return;
@@ -295,9 +299,9 @@ export default {
                 res.send("Usuario eliminado correctamente");
             })
         })
-    },
+    }
 
-    post(req: any, res: any) {
+    public static post(req: any, res: any) {
         if (!req.body.contraseña || !req.body.nombre || !req.body.mail || !req.body.DNI
             || !req.body.fechaNac || !req.body.apellido || !req.body.fotoDoc) {
             console.log(req.body)
@@ -374,8 +378,8 @@ export default {
                 apostadorModel.create(usuario).then((c) => res.send("usuario subido correctamente"))
             })
         })
-    },
-    modify(req: any, res: any) {
+    }
+    public static modify(req: any, res: any) {
         if (!req.params.DNI) {
             res.status(400).send("No se proporciono un DNI");
             return;

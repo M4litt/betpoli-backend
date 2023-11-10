@@ -8,24 +8,21 @@ import matchStates from "../utils/constants/matchStates";
 import createMatch from "../utils/createMatch";
 import { periodistaModel } from "../models/periodista.model";
 
-export default {
-    placeholder: (req: Request, res: Response) => {
-        res.status(200).send('Response from match.controller')
-    },
+export class MatchController {
 
-    getMatches: async (req: Request, res: Response) => {
+    public static async getMatches(req: Request, res: Response) {
         const matches = await matchModel.find()
         res.status(200).send(matches)
-    },
+    }
 
-    getMatchesPage: async (req: Request, res: Response) => {
+    public static async getMatchesPage(req: Request, res: Response){
         const page = Number(req.params.page) < 1 ? 1 : Number(req.params.page)
         const limit = 15
         const matches = await matchModel.find().skip((page - 1) * limit).limit(limit)
         res.status(200).send(matches)
-    },
+    }
 
-    getMatch: async (req: Request, res: Response) => {
+    public static async getMatch(req: Request, res: Response){
         try {
             const match = await matchModel.findById(req.params.id)
             res.status(200).send(match)
@@ -39,18 +36,18 @@ export default {
                 })
             }
         }
-    },
+    }
 
-    createMatch: async (req: Request, res: Response) => {
+    public static async createMatch(req: Request, res: Response) {
         const match = await matchModel.create(createMatch(
             req.body.local,
             req.body.visitante,
             req.body.fecha
         ))
         res.status(201).send(match)
-    },
+    }
 
-    nextState: async (req: Request, res: Response) => {
+    public static async nextState(req: Request, res: Response){
         const match = await matchModel.findById(req.params.id)
         if (!match) {
             return res.status(404).send("Match not found")

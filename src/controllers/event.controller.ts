@@ -15,12 +15,8 @@ import { periodistaModel } from "../models/periodista.model";
 */
 
 
-export default {
-    placeholder: (req: Request, res: Response) => {
-        return res.status(200).send('Response from event.controller')
-    },
-
-    getGlobalEvents: async (req: Request, res: Response) => {
+export class EventController {
+    public static async getAllEvents(req: Request, res: Response){
         
         try {
             const globalEvents = await eventModel.find();
@@ -35,9 +31,9 @@ export default {
             console.error("Error al buscar eventos");
             return res.status(500).send("Ocurrio un error al buscar eventos");
         }
-    },
+    }
 
-    getMatchEvents: async (req: Request, res: Response) => {
+    public static async getMatchEvents(req: Request, res: Response){
 
         try {
             const matchEvents = await eventModel.find({idPartido:req.params.idPartido});
@@ -52,9 +48,9 @@ export default {
             console.error("Error buscando eventos");
             return res.status(500).send("Ocurrio un error al buscar eventos");
         }
-    },
+    }
 
-    createEvent: async (req: Request, res: Response) => {
+    public static async createEvent(req: Request, res: Response){
         const timestampInMilis  = new Date().getTime();
         try {
             const existingPartido = await matchModel.findById(req.body.idPartido);
@@ -105,9 +101,9 @@ export default {
             return res.status(500).send("Ocurrio un error al crear el evento");
         } 
 
-    },
+    }
 
-    nullifyEvent: async (req: Request, res: Response) => {
+    public static async nullifyEvent(req: Request, res: Response){
 
         try {
             const nullifiedEvent = await eventModel.findOneAndUpdate(            
@@ -137,9 +133,9 @@ export default {
             console.error("Error al anular el evento");
             return res.status(500).send("Ocurrio un error al anular el evento");
         }
-    },
+    }
 
-    deleteEvent: async (req: Request, res: Response) => {
+    public static async deleteEvent(req: Request, res: Response){
         try {
             const deletedEvent = await eventModel.findOneAndDelete(
                 {

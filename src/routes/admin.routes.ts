@@ -10,5 +10,3 @@ AdminRouter
 .get   ('/',         admin.auth , AdminController.getAll)
 .get   ('/:id',      admin.auth , AdminController.getOne)
 .delete('/:id',      admin.auth , AdminController.delete)
-
-
