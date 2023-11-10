@@ -1,5 +1,5 @@
 import express from "express";
-import { auth } from "../middleware/auth.periodista.mw";
+import { auth as periodistaAuth } from "../middleware/auth.periodista.mw";
 import { MatchController } from "../controllers/match.controller";
 
 import { eventRouter } from "./event.routes";
@@ -7,12 +7,13 @@ import { eventRouter } from "./event.routes";
 export const partidoRouter = express.Router()
 
 partidoRouter
-    .get('/', MatchController.getMatches)
-    .post('/', MatchController.createMatch)
-    .get('/all', MatchController.getMatches)
-    .get('/page/:page', MatchController.getMatchesPage)
-    .get('/single/:id', MatchController.getMatch)
-    .post('/single/:id/next', auth, MatchController.nextState)
+    .get    ('/single/:id',         MatchController.getMatch)
+    .get    ('/',                   MatchController.getMatches)
+    .get    ('/all',                MatchController.getMatches)
+    .get    ('/page/:page',         MatchController.getMatchesPage)
+    .post   ('/',                   periodistaAuth, MatchController.createMatch)
+    .post   ('/single/:id/next',    periodistaAuth, MatchController.nextState)
 
 partidoRouter
-    .use('eventos', eventRouter).use('events', eventRouter)
+    .use    ('eventos',             eventRouter)
+    .use    ('events',              eventRouter)

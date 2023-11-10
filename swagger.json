@@ -1,39 +1,47 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Matches API to create, update, delete and get the matches",
+        "description": "BerPoli API",
         "version": "1.0.0",
-        "title": "Periodista Backend (Partidos)"
+        "title": "BetPoli Backend"
     },
     "schemes": [
         "http"
     ],
     "host": "localhost:6969",
-    "basePath": "/matches",
-    "paths": {
-        "/all": {
-            "get": {
-                "summary": "Devolver todos los partidos",
-                "description": "Devuelve todos los partidos",
-                "produces": [
-                    "application/json"
-                ],
-                "parameters": [],
-                "responses": {
-                    "200": {
-                        "description": "Devolución exitosa",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/todosResponse"
-                            }
-                        }
-                    }
-                }
-            }
+    "basePath": "/",
+    "tags": [
+        {
+            "name": "Apostadores",
+            "description": "Apostadores API"
         },
-        "/single/{id}": {
+        {
+            "name": "Periodistas",
+            "description": "Periodistas API"
+        },
+        {
+          "name": "Partidos",
+          "description": "Partidos API"
+        },
+        {
+            "name": "Equipos",
+            "description": "Equipos API"
+        },
+        {
+            "name": "Ligas",
+            "description": "Ligas API"
+        },
+        {
+            "name": "Admin",
+            "description": "Admin API"
+        }
+    ],
+    "paths": {
+        "/partidos/single/{id}": {
             "get": {
+                "tags": [
+                    "Partidos"
+                ],
                 "summary": "Devolver un solo partido",
                 "description": "Devuelve un solo partido",
                 "produces": [
@@ -67,8 +75,35 @@
                 }
             }
         },
-        "/single/{id}/next": {
+        "/partidos/all": {
+            "get": {
+                "tags": [
+                    "Partidos"
+                ],
+                "summary": "Devolver todos los partidos",
+                "description": "Devuelve todos los partidos",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Devolución exitosa",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/todosResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/partidos/single/{id}/next": {
             "post": {
+                "tags": [
+                    "Partidos"
+                ],
                 "summary": "Actualizar el estado del partido",
                 "description": "Actualizar al siguiente estado del partido. ",
                 "produces": [
@@ -116,8 +151,11 @@
                 }
             }
         },
-        "/page/{page}": {
+        "/partidos/page/{page}": {
             "get":{
+                "tags": [
+                    "Partidos"
+                ],
                 "summary": "Devolver todos los partidos de una página",
                 "description": "Devuelve todos los partidos de una página",
                 "produces": [
@@ -130,6 +168,38 @@
                         "description": "Número de página a devolver",
                         "required": true,
                         "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Devolución exitosa",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/todosResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/partidos/": {
+            "post":{
+                "tags": [
+                    "Partidos"
+                ],
+                "summary": "Crea un nuevo partido",
+                "description": "Crea un nuevo partido",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "Token de autenticación (PERIODISTA)",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
