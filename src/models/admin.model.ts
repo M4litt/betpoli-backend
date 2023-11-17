@@ -3,7 +3,7 @@ import { ModelOptions, getModelForClass, prop } from "@typegoose/typegoose";
 @ModelOptions(
     { schemaOptions: { collection: "admin" } }
 )
-class Admin 
+export class Admin 
 {
     @prop({ required: true })
     nombre: string = '';

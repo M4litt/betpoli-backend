@@ -7,6 +7,7 @@ import bodyParser                     from 'body-parser';
 import mongoose                       from "mongoose";
 import dotenv                         from 'dotenv'
 import cors                           from 'cors'
+
 // * Routers
 import { PeriodistaRouter }           from './routes/periodista.routes';
 import { partidoRouter }              from './routes/partido.routes';
@@ -16,7 +17,8 @@ import { AdminRouter }                from './routes/admin.routes';
 import { rutasUsuarios }              from './routes/user.routes';
 import { ligaRouter }                 from './routes/liga.routes';
 import { paisRouter }                 from './routes/pais.routes';
-import { uploadFile } from './controllers/upload.controller';
+import { uploadFile }                 from './controllers/upload.controller';
+import { jugadorRouter } from './routes/jugador.routes';
 
 dotenv.config();
 
@@ -34,14 +36,13 @@ app
 */
 
 app
-.use(bodyParser.json())
 .use(cors({ origin: [`http://localhost:${PORT}`, `http://localhost:3000`], }))
+.use(bodyParser.json())
 
 // routes
 .get('/', (req:Request, res:Response) => res.send("Bienvenido a mi api"))
 .use('/api-docs',    swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 .use("/apuestas",    rutasApuestas)
-.use("/usuarios",    rutasUsuarios)
 .use('/usuarios',    rutasUsuarios)
 .use('/periodistas', PeriodistaRouter)
 .use('/equipos',     equipoRouter)
@@ -49,21 +50,18 @@ app
 .use('/partidos',    partidoRouter)
 .use('/liga',        ligaRouter)
 .use('/pais',        paisRouter)
+.use('/jugadores',   jugadorRouter)
 
 // file upload
 .use(fileUpload({ limits: { fileSize: 10000000 }, abortOnLimit: true }))
-.use('/public', express.static('.public'))  // fetch files using http://<HOST>:<PORT>/public/<FOLDER-NAME>/<FILENAME>
-.use('/upload/:foldername', uploadFile)
+.use('/public', express.static('.public'))  // fetch files using http://<HOST>:<PORT>/public/<FILE_NAME>
+.use('/upload/:foldername/:id', uploadFile)
 
 // init
 .listen(PORT, () => console.log(`> BetPoeli deployed on http://localhost:${PORT}`));
 
-// db
 mongoose
 .set('strictQuery',  false)
 .connect(process.env.MONGO_CON_STRING!)
 .then(() => console.log(`> mongoDB connection initialized.`))
 
-
-
-// :3

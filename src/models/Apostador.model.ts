@@ -3,7 +3,8 @@ import { prop, getModelForClass, modelOptions } from "@typegoose/typegoose";
 @modelOptions({
     schemaOptions: {"collection": "Apostador"}
 })
-class Apostador {
+class Apostador 
+{
     @prop({required: true})
     nombre!: String
 

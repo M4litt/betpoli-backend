@@ -9,6 +9,7 @@ import { IPeriodista } from '../types/periodista.type';
 import { periodistaModel } from '../models/periodista.model';
 import { IPartido, Partido } from '../types/partido.type';
 import { partidoModel } from '../models/partido.model';
+import fileUpload from 'express-fileupload';
 
 // env
 dotenv.config();
@@ -235,5 +236,4 @@ export class PeriodistaController {
             resolve(output);
         })
     }
-    
 }

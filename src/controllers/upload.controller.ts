@@ -6,7 +6,7 @@ import { equipoModel }       from '../models/equipo.model';
 import { ligaModel }         from '../models/liga.model';
 import { paisModel }         from '../models/pais.model';
 
-// path: ./.public/<carpeta>/<id>.<file-extension>
+// la estructura es: /.public/<carpeta>/<id>.<file-extension>
 
 export async function uploadFile(req:Request, res:Response)
 {
@@ -61,14 +61,3 @@ export async function uploadFile(req:Request, res:Response)
     })
     .catch(err => res.status(500).send(`Error interno del servidor: ${err}`));
 }
-
-/* 
-.html
-<!-- para los de testing: -->
-
-<form action="http://localhost:<PORT>/upload/<FOLDER>/<ID>" method="POST" enctype="multipart/form-data">
-    <input type="file" name="image" accept="image/*">
-    <button type="submit">Upload Image</button>
-</form>
-
-*/

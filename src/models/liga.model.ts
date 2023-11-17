@@ -6,7 +6,8 @@ import { Pais } from "./pais.model";
 @modelOptions({
     schemaOptions: { collection: "ligas" }
 })
-export class Liga {
+export class Liga 
+{
     @prop({required: true})
     nombre!:    string;
 
@@ -18,6 +19,7 @@ export class Liga {
 
     @prop({required: true})
     escudo!:    string;
+
 }
 
 export const ligaModel = getModelForClass(Liga);

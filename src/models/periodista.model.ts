@@ -3,7 +3,8 @@ import { getModelForClass, modelOptions, mongoose, prop } from "@typegoose/typeg
 @modelOptions({
     schemaOptions: { collection: "periodistas" }
 })
-class Periodista {
+export class Periodista 
+{
     @prop({ required: true })
     nombre: string = '';
 

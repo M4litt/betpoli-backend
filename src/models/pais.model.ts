@@ -4,7 +4,8 @@ import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose"
     schemaOptions: { collection: "paises" }
 })
 
-export class Pais {
+export class Pais 
+{    
     @prop({required: true}) 
     nombre!:        string;
 
