@@ -4,17 +4,17 @@ import { urlApiPartidos } from "./apostador.controller"
 
 export class ApuestaController {
     public static cerrarApuestas(req: any, res: any) {
-        if (!req.params.idPartido) {
+        if (!req.params.idPartido || !req.body.idPartido) {
             res.status(400).send("no se enviaron todos los datos")
             return
         }
 
-        if (!isValidObjectId(req.params.idPartido)) {
+        if (!isValidObjectId(req.params.idPartido) || !isValidObjectId(req.body.idPartido)) {
             res.status(400).send("id de partido invalida")
             return
         }
 
-        fetch(urlApiPartidos + "/matches/single/" + req.params.idPartido, { method: "GET" })
+        fetch(urlApiPartidos + "/matches/single/" + req.params.idPartido ? req.params.idPartido : req.body.idPartido, { method: "GET" })
             .then((v) => v.json())
             .then((b) => {
                 if(b.estado == "match_over"){

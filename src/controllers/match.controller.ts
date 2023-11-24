@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
 import { matchModel } from "../models/match.model";
 import { eventModel } from "../models/event.model";
 import nextState from "../utils/stateSwitch";
@@ -8,6 +8,7 @@ import matchStates from "../utils/constants/matchStates";
 import createMatch from "../utils/createMatch";
 import { periodistaModel } from "../models/periodista.model";
 import generarObjetoProbabilidad from "../utils/probabilities";
+import { ApuestaController } from "./apuesta.controller";
 
 export class MatchController {
 
@@ -83,6 +84,13 @@ export class MatchController {
                 return res.status(404).send("Match not found")
             }
 
+            if(match.estado == matchStates.NOT_STARTED && updatedMatch.estado != matchStates.NOT_STARTED){
+                req.body = {
+                    idPartido: updatedMatch._id
+                }
+                ApuestaController.cerrarApuestas(req, new Response())
+            }
+
             eventModel.create({
                 idPartido: updatedMatch._id,
                 nombre: "matchStateChange",
@@ -94,6 +102,8 @@ export class MatchController {
                 idPeriodista: objectIdStr
             })
           
+
+
             console.log(updatedMatch)
             res.status(200).send(updatedMatch)
 
