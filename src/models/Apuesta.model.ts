@@ -8,10 +8,7 @@ class Apuesta {
     idPartido!: String
 
     @prop({required: true})
-    golesVisitante!: Number
-
-    @prop({required: true})
-    golesLocal!: Number
+    tipoApuesta!: String
 
     @prop({required: true})
     monto!: Number

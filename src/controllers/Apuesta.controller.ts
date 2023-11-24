@@ -1,6 +1,7 @@
 import { isValidObjectId } from "mongoose"
 import { apuestaModel } from "../models/Apuesta.model"
 import { urlApiPartidos } from "./Apostador.controller"
+import { partidoModel } from "../models/partido.model"
 
 export default {
     cerrarApuestas(req: any, res: any) {
@@ -14,33 +15,37 @@ export default {
             return
         }
 
-        fetch(urlApiPartidos + "/matches/single/" + req.params.idPartido, { method: "GET" })
-            .then((v) => v.json())
-            .then((b) => {
-                if(b.estado == "match_over"){
-                    const golVisitante: String = b.gol_visitante;
-                    const golLocal: String = b.gol_local;
-
-                    apuestaModel.updateMany({
-                           $or: [
-                              {golesLocal: { $ne: golLocal}},
-                              {golesVisitante: { $ne: golVisitante}}
-                           ]
-                        },{$set: { estado: "perdida" }}).then((b) => {
-                            apuestaModel.updateMany({golesLocal: golLocal, golesVisitante: golVisitante}, 
-                                {$set: { estado: "ganada" }}).then((c) => {
-                                    res.status(200).send("apuestas cerradas correctamente")
-                                    return
-                                })
-                        })
+        partidoModel.findOne({_id: req.params}).then((b) => {
+            if(b == undefined){
+                return res.status(400).send("partido no encontrado")
+            }
+            if(b.estado != "match_over"){
+                return res.status(400).send("partido no terminado");
+            }
+            const diferencia = b.gol_local - b.gol_visitante;
+            apuestaModel.updateMany({_id: req.params.idPartido}, {$set: {estado: "perdida"}}).then((v) => {
+                if(diferencia == 0){
+                    apuestaModel.updateMany({_id: req.params.idPartido, $expr: {$eq: ["$gol_local", "$gol_visitante"]}}, 
+                    {$set: {estado: "ganada"}}).then((n) => {
+                        res.status(200).send("apuestas cerradas correctamente")
+                        return
+                    })
+                }
+                else if(diferencia < 0){
+                    apuestaModel.updateMany({_id: req.params.idPartido, gol_visitante: {$gt: "$gol_local"}}, 
+                    {$set: {estado: "ganada"}}).then((n) => {
+                        res.status(200).send("apuestas cerradas correctamente")
+                        return
+                    })
                 }
                 else{
-                    res.status(400).send("el partido no termino")
+                    apuestaModel.updateMany({_id: req.params.idPartido, gol_local: {$gt: "$gol_visitante"}}, 
+                    {$set: {estado: "ganada"}}).then((n) => {
+                        res.status(200).send("apuestas cerradas correctamente")
+                        return
+                    })
                 }
             })
-            .catch((err: any) => {
-                console.error('error: ' + err)
-                res.status(400).send("Partido inexistente")
-            });
+        })
     }
 }

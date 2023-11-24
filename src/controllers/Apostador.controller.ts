@@ -7,6 +7,7 @@ import { isValidObjectId } from "mongoose";
 import { apuestaModel } from "../models/Apuesta.model";
 import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import fs from "fs"
+import { partidoModel } from "../models/partido.model";
 const otpGenerator = require('otp-generator');
 export const urlApiPartidos: String = "http://172.16.255.204:6969"
 
@@ -48,15 +49,15 @@ const transporter = nodemailer.createTransport({
     port: 465,
     host: "smtp.gmail.com",
     auth: {
-        user: 'pedrothedeveloper@gmail.com',
-        pass: 'znxs jmzn gefs mwdi ',
+        user: process.env.MAIL_VERIFICACION,
+        pass: process.env.TOKEN_MAIL,
     },
     secure: true,
 });
 
 function sendMail(to: String, subject: String, text: String) {
     const mailData = {
-        from: "pedroTheDeveloper@gmail.com",
+        from: process.env.MAIL_VERIFICACION,
         subject: subject,
         to: to,
         text: text,
@@ -102,7 +103,6 @@ export default {
             res.status(400).send("Imagen invalida1");
             return;
         }
-
         if (!nombreApellidoRegex.test(req.body.nombre)) {
             res.status(400).send("Nombre Invalido");
             return;
@@ -137,7 +137,7 @@ export default {
                             sendMail: ""
                         }
                         const temp: any = req.body;
-                        temp["estado"] = "activo";
+                        temp["estado"] = "no_activo";
                         temp["contraseña"] = sha256(req.body.contraseña);
                         temp["fotoDoc"] = "img/perfil/" + req.body.DNI + "_perfil.png"
 
@@ -145,7 +145,7 @@ export default {
                             data.save()
                             todaladata.creado = JSON.stringify(data)
                         });
-    
+
                         sendMail(req.body.mail.valueOf(), "Verificacion del correo",
                             "Pincha el enlace para activar la cuenta: http://localhost:4200/verify/" + generarClave(req.body.mail))
                         todaladata.sendMail = req.body
@@ -191,7 +191,7 @@ export default {
         console.log(req.body)
         apostadorModel.findOne({ "mail": req.body.mail }).then((b) => {
             if (b) {
-                if (b.estado != "activo") {
+                if (b.estado != "aceptado") {
                     res.status(400).send("cuenta no activada");
                     return;
                 }
@@ -212,23 +212,18 @@ export default {
         })
     },
     Apostar(req: any, res: any) {
-        if (!req.body.idPartido || !req.body.monto || !req.body.golesVisitante || !req.body.golesLocal) {
+        if (!req.params.idPartido || !req.body.monto || !req.body.tipoApuesta || !req.body.multiplicador) {
             res.status(400).send("no se proporcionaron todos los datos")
             return
         }
 
-        if (!isValidObjectId(req.body.idPartido)) {
+        if (!isValidObjectId(req.params.idPartido)) {
             res.status(400).send("id de partido invalida")
             return
         }
 
-        if (isNaN(Number(req.body.golesVisitante)) || Number(req.body.golesVisitante) < 0) {
-            res.status(400).send("formato de los goles visitantes invalido")
-            return
-        }
-
-        if (isNaN(Number(req.body.golesLocal)) || Number(req.body.golesLocal) < 0) {
-            res.status(400).send("formato de los goles locales invalido")
+        if (req.body.tipoApuesta != "Gana_Local" || req.body.tipoApuesta != "Gana_Visitante" || req.body.tipoApuesta != "Empate") {
+            res.status(400).send("tipo de apuesta invalido")
             return
         }
 
@@ -237,30 +232,34 @@ export default {
             return
         }
 
+
+        if (isNaN(Number(req.body.multiplicador)) || Number(req.body.multiplicador) < 1) {
+            res.status(400).send("multiplicador invalido");
+            return;
+        }
+
         const mailUsuario: String = JSON.parse(JSON.stringify(jwt.verify(req.headers.authorization, process.env.JWT_SECRET!))).mail
 
-        apuestaModel.findOne({ mailUsuario: mailUsuario, idPartido: req.body.idPartido }).then((v) => {
-            console.log(v)
-            if (v) {
-                res.status(400).send("Este usuario ya aposto")
-                return
+        partidoModel.findOne({ _id: req.params.idPartido }).then((v) => {
+            if (v == undefined) {
+                return res.status(400).send("Partido inexistente");
             }
-            else {
-                fetch(urlApiPartidos + "/matches/single/" + req.body.idPartido, { method: "GET" })
-                    .then((v) => v.json())
-                    .then((b) => {
-                        let todaData: any = req.body;
-                        todaData["mailUsuario"] = mailUsuario;
-                        todaData["estado"] = "abierta";
-                        console.log(todaData)
-                        apuestaModel.create(todaData)
-                        res.send("Apuesta subida correctamente")
-                    })
-                    .catch((err: any) => {
-                        console.error('error: ' + err)
-                        res.status(400).send("Partido inexistente")
-                    });
+            else if (v.estado != "not_started") {
+                return res.status(400).send("Partido ya iniciado");
             }
+            apuestaModel.findOne({ mailUsuario: mailUsuario, idPartido: req.body.idPartido }).then((b) => {
+                console.log(b);
+                if (b) {
+                    res.status(400).send("Este usuario ya aposto");
+                    return;
+                }
+                let todaData: any = req.body;
+                todaData["mailUsuario"] = mailUsuario;
+                todaData["estado"] = "abierta";
+                console.log(todaData);
+                apuestaModel.create(todaData);
+                res.send("Apuesta subida correctamente");
+            })
         })
     },
     // Alta, baja y modificacion !!!
