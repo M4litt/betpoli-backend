@@ -1,5 +1,4 @@
 import { getModelForClass, modelOptions, prop } from "@typegoose/typegoose";
-import { Liga } from "./liga.model";
 
 @modelOptions({
     schemaOptions: { collection: "partidos" }
@@ -25,7 +24,7 @@ export class Partido
     fecha!:         string;
 
     @prop({required: true}) 
-    liga!:          Liga;
+    liga!:          string;
 }
 
 export const partidoModel = getModelForClass(Partido)
