@@ -4,7 +4,7 @@ import matchStates from "../utils/constants/matchStates";
 @modelOptions({
     schemaOptions: {"collection": "partidos"}
 })
-class Match {
+export class Match {
     @prop({required: true})
     local!: string
 

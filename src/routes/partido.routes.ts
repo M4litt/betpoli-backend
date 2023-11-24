@@ -10,6 +10,7 @@ partidoRouter
     .get    ('/single/:id',         MatchController.getMatch)
     .get    ('/',                   MatchController.getMatches)
     .get    ('/all',                MatchController.getMatches)
+    .get    ('/probabilities/:id', MatchController.getProbabilities)
     .get    ('/page/:page',         MatchController.getMatchesPage)
     .post   ('/',                   periodistaAuth, MatchController.createMatch)
     .post   ('/single/:id/next',    periodistaAuth, MatchController.nextState)

@@ -9,7 +9,6 @@ export class Team {
 
     @prop({required: true}) 
     escudo!:        string;
-
 }
 
 export const teamModel = getModelForClass(Team);

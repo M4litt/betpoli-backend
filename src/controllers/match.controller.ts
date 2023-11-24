@@ -7,6 +7,7 @@ import { InvalidMatchState } from "../utils/errors/invalidMatchState";
 import matchStates from "../utils/constants/matchStates";
 import createMatch from "../utils/createMatch";
 import { periodistaModel } from "../models/periodista.model";
+import generarObjetoProbabilidad from "../utils/probabilities";
 
 export class MatchController {
 
@@ -104,7 +105,25 @@ export class MatchController {
             console.error("Error updating match:", error);
             res.status(500).send("An error occurred while updating the match");
         }
+    }
+     
+    public static async getProbabilities(req: Request, res: Response){
+        const match = await matchModel.findById(req.params.id);
 
+        const objetoProbabilidadLocal = await generarObjetoProbabilidad(match!.local);
+        const objetoProbabilidadVisitante = await generarObjetoProbabilidad(match!.visitante);
+
+        let totalPartidos =
+        objetoProbabilidadLocal.ganados + objetoProbabilidadLocal.empatados +
+        objetoProbabilidadVisitante.ganados + objetoProbabilidadVisitante.empatados;
+     
+        const probabilidades = {
+            ganaLocal: (objetoProbabilidadLocal.ganados/totalPartidos),
+            ganaVisitante: (objetoProbabilidadVisitante.ganados/totalPartidos),
+            ganaOEmpataLocal: (objetoProbabilidadLocal.ganados + objetoProbabilidadLocal.empatados)/totalPartidos,
+            ganaOEmpataVisitante: (objetoProbabilidadVisitante.ganados + objetoProbabilidadVisitante.empatados)/totalPartidos
+        }
         
+        res.status(200).send(probabilidades);
     }
 }
